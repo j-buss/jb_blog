@@ -11,7 +11,12 @@ Let’s make a robo-Nietzsche...you know some electronic embodiment of Friedrich
  [Public domain], via Wikimedia Commons" href="https://commons.wikimedia.org/wiki/File:Nietzsche187a.jpg"><img width="175" alt="Nietzsche187a" src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Nietzsche187a.jpg/256px-Nietzsche187a.jpg"></a>
 
 
-![robot]({{site.url}}/images/robot.png)
+![robot]({{ site.baseurl }}/images/robot.png)
+
+{{ site.url }}
+
+
+This is the baseurl|{{ site.baseurl }}|
 
 The following set of blogs document the information for exploring the generation of text from an LSTM.
 The impetus for this experiment was the book [Deep Learning with Python by François Chollet][DLwP_Book]. 
