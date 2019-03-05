@@ -83,5 +83,70 @@ https://github.com/fchollet/deep-learning-with-python-notebooks/blob/master/8.1-
 
 When you click off of the entry blank the colab interogates the inforamtion and loads the informaitotn pertaining to the repository:
 
+<img src="{{site.baseurl}}/assets/images/dlwp_colab_to_github_02.png" alt="Connect Google Colaboratory to Github" width="800"/>
+
+Simply click the “Open notebook in new tab” button to start editing the code:
+
+<img src="{{site.baseurl}}/assets/images/dlwp_colab_to_github_03.png" alt="Connect Google Colaboratory to Github" width="800"/>
+
+The notebook will open:
+
+<img src="{{site.baseurl}}/assets/images/dlwp_notebook_01.png" alt="Connect Google Colaboratory to Github" width="800"/>
+
+Save your notebook to Github:
+
+<img src="{{site.baseurl}}/assets/images/text_gen_lstm_save_to_github.png" alt="Connect Google Colaboratory to Github" width="800"/>
+
+If this is your first time saving from Colab to Github you may need to authorize your
+
+<img src="{{site.baseurl}}/assets/images/authorize_colaboratory.png" alt="Connect Google Colaboratory to Github" width="800"/>
+
+{% highlight shell %} 
+git clone https://github.com/fchollet/deep-learning-with-python-notebooks.git
+cp deep-learning-with-python-notebooks/8.1-text-generation-with-lstm.ipynb text_gen_lstm/learn/
+cd text_gen_lstm
+git status
+git add 8.1-text-generation-with-lstm.ipynb
+git status
+git commit -m "added jupyter notebook from fchollet/deep-learning-with-python-notebooks"
+{% endhighlight %}
+
+After the notebook has been copied to your github repository we can head back over to colaboratory and start up the notebook:
+
+<img src="{{site.baseurl}}/assets/images/text_gen_lstm_colab_to_github_01.png" alt="Connect Google Colaboratory to Github" width="800"/>
+
+Click on the name in the middle of the pop-up screen
+
+<img src="{{site.baseurl}}/assets/images/text_gen_lstm_colab_to_github_warning.png" alt="Connect Google Colaboratory to Github" width="800"/>
+
+Click the “Run Anyway” option
+
+<img src="{{site.baseurl}}/assets/images/text_gen_lstm_reset_all_runtimes.png" alt="Connect Google Colaboratory to Github" width="800"/>
+
+Click “Yes”
+
+
+Within the notebook you can select each cell and use the key-stroke “Shift+Enter” to execute each cell.
+
+<img src="{{site.baseurl}}/assets/images/dlwp_notebook_01.png" alt="Connect Google Colaboratory to Github" width="800"/>
+
+Execute each of the cells until:
+
+<img src="{{site.baseurl}}/assets/images/notebook_core_logic.png" alt="Connect Google Colaboratory to Github" width="800"/>
+
+This is the core of the logic. While the code will work correctly it will run for quite some time. 
+So before running change the epoch from range(1, 60) to range(1,2)
+
+Then it will start running 2 epochs. 
+This is enough to give us comfort that we have succeeded in setting 
+up our repository and have executed the setup steps successfully.
+
+Hopefully this has given you a little introduction of 
+
+I have simply walked through a few of the basics of using the colaboratory / jupyter notebook.
+However the following notebook has a significant amount of examples that can be executed to learn additional functionality.
+[Colaboratory Github Demo](https://colab.research.google.com/github/googlecolab/colabtools/blob/master/notebooks/colab-github-demo.ipynb)
+
+
 [DLwP_Book]: https://www.manning.com/books/deep-learning-with-python
 [DLwP_github]: https://github.com/fchollet/deep-learning-with-python-notebooks
