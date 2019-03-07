@@ -1,10 +1,15 @@
 ---
 layout: post
-title:  "Introduction"
-date:   2019-03-01 18:49:37 -0600
+title:  "Colab - Detail"
+date:   2019-03-08 08:00:00 -0600
 permalink: /:categories/:title.html
 categories: text-gen-lstm
 ---
+
+So last time with the Introduction we gave some motivition of why you might want to do this 
+
+1. Prepare Data
+
 
 What do you get when you combine a German philosopher and some AI..
 
@@ -17,15 +22,10 @@ What do you get when you combine a German philosopher and some AI..
 
 The following set of blogs document the information for exploring the generation of text from an LSTM.
 The impetus for this experiment was the book [Deep Learning with Python by François Chollet][DLwP_Book]. 
-### What are you talking about?
-
-Well really it is just using some machine learning to "create" a set of new text based on a large corpus of text.
 
 ### Why?
 
-Why would I want to create a Robo Nietzsche? Well...it kinda evolved...I mean...I definitely didn't just start with this idea.
-Mostly I just wanted to learn about deep learning. 
-I happened to be working through It really originated from the idea of creating this is not just something one comes up with hjust came about. hhhhI  wanted to learn how to use tensorflow. And I wanted a deeper understanding than I could easily find online.
+I  wanted to learn how to use tensorflow. And I wanted a deeper understanding than I could easily find online.
 So I picked up Deep Learning with Python by François Chollet. 
 The book provides a wonderful explanation of Deep Learning using Keras. 
 
@@ -96,15 +96,15 @@ Simply click the “Open notebook in new tab” button to start editing the code
 
 The notebook will open:
 
-<img src="{{site.baseurl}}/assets/images/dlwp_notebook_01.png" alt="Deep Learning with Python Notebook" width="800"/>
+<img src="{{site.baseurl}}/assets/images/dlwp_notebook_01.png" alt="Connect Google Colaboratory to Github" width="800"/>
 
 Save your notebook to Github:
 
-<img src="{{site.baseurl}}/assets/images/text_gen_lstm_save_to_github.png" alt="Save Google Colaboratory Notebook to Github" width="800"/>
+<img src="{{site.baseurl}}/assets/images/text_gen_lstm_save_to_github.png" alt="Connect Google Colaboratory to Github" width="800"/>
 
 If this is your first time saving from Colab to Github you may need to authorize your
 
-<img src="{{site.baseurl}}/assets/images/authorize_colaboratory.png" alt="Authorize Colaboratory to Github" width="800"/>
+<img src="{{site.baseurl}}/assets/images/authorize_colaboratory.png" alt="Connect Google Colaboratory to Github" width="800"/>
 
 {% highlight shell %} 
 git clone https://github.com/fchollet/deep-learning-with-python-notebooks.git
@@ -122,22 +122,22 @@ After the notebook has been copied to your github repository we can head back ov
 
 Click on the name in the middle of the pop-up screen
 
-<img src="{{site.baseurl}}/assets/images/text_gen_lstm_colab_to_github_warning.png" alt="Warning that notebook was not authored by Google" width="800"/>
+<img src="{{site.baseurl}}/assets/images/text_gen_lstm_colab_to_github_warning.png" alt="Connect Google Colaboratory to Github" width="800"/>
 
 Click the “Run Anyway” option
 
-<img src="{{site.baseurl}}/assets/images/text_gen_lstm_reset_all_runtimes.png" alt="Reset all runtimes" width="800"/>
+<img src="{{site.baseurl}}/assets/images/text_gen_lstm_reset_all_runtimes.png" alt="Connect Google Colaboratory to Github" width="800"/>
 
 Click “Yes”
 
 
 Within the notebook you can select each cell and use the key-stroke “Shift+Enter” to execute each cell.
 
-<img src="{{site.baseurl}}/assets/images/dlwp_notebook_01.png" alt="Execution of a cell in Colaboratory notebook" width="800"/>
+<img src="{{site.baseurl}}/assets/images/dlwp_notebook_01.png" alt="Connect Google Colaboratory to Github" width="800"/>
 
 Execute each of the cells until:
 
-<img src="{{site.baseurl}}/assets/images/notebook_core_logic.png" alt="Notebook core logic" width="800"/>
+<img src="{{site.baseurl}}/assets/images/notebook_core_logic.png" alt="Connect Google Colaboratory to Github" width="800"/>
 
 This is the core of the logic. While the code will work correctly it will run for quite some time. 
 So before running change the epoch from range(1, 60) to range(1,2)
