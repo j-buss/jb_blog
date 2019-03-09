@@ -54,14 +54,18 @@ So if you are ready...let's dive right in...
 
 ### Start the Build
 
-I wanted a development environment that worked from me. While it may not work for everyone these were my requirements:
+#### Where to build?
+I wanted an environment that worked from me. I wanted to satisfy these three requirements:
 
 1. Use a “widely” regarded development framework
-2. Save code in an online repository
-3. Leverage a “cloud” development environment
+2. Leverage a “cloud” development environment
+3. Save code in an online repository
 
-Using Google’s [Colaboratory](https://colab.research.google.com/) satisfies all of these requirements. 
-It is completely free, it leverages [Jupyter](https://jupyter.org/) notebooks and stores the code in your Google Drive or Github. 
+Using Google’s [Colaboratory](https://colab.research.google.com/) satisfies all three of these requirements. 
+It uses  
+[Jupyter](https://jupyter.org/) notebooks, which are ubiquitess in the analytics community,
+hosted on Google's infrastructure so it can be used from anywhere and it allows you to save your code in either Google Drive or Github. 
+
 
 When you open up the Colab environment the default screen contains a “Getting Started” section that will walk 
 you through many introductory steps to perform. 
