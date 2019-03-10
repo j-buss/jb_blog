@@ -15,44 +15,55 @@ What do you get when you combine a German philosopher and some AI..
 <img src="{{ site.baseurl }}/assets/images/robot.png" style="width: 48%; margin-right: 1%; margin-bottom: 0.5em;" title="Bilboq [Public domain], via Wikimedia Commons">
 </p>
 
-The following set of blogs document the information for exploring the generation of text from an LSTM.
-The impetus for this experiment was the book [Deep Learning with Python by François Chollet][DLwP_Book]. 
-### What are you talking about?
+# Introduction
 
-Well really it is just using some machine learning to "create" a set of new text based on a large corpus of text.
+This all started when I wanted to learn about deep learning. I was following along with the exercises in the book [Deep Learning with Python by François Chollet][DLwP_Book]. 
 
-### Why?
+When I got to Chapter 8 - Generative deep learning François had a great example of creating text with a model after being trained on a corpus of text.
+It was fascinating working through all the code. However I wanted a way to create something more than just reproducing code. I wanted to make an **application**...something I could interact with.
 
-Why would I want to create a Robo Nietzsche? Well...it kinda evolved...I mean...I definitely didn't just start with this idea.
-Mostly I just wanted to learn about deep learning. 
-I happened to be working through It really originated from the idea of creating this is not just something one comes up with hjust came about. hhhhI  wanted to learn how to use tensorflow. And I wanted a deeper understanding than I could easily find online.
-So I picked up Deep Learning with Python by François Chollet. 
-The book provides a wonderful explanation of Deep Learning using Keras. 
+So that was how my journey began to build a text generating application using an LSTM model.
 
-I learned a lot as I followed along and performed all the steps from the book. 
-It was going well but there was a question that was simmering below the surface that finally came to a head by the time I got to chapter 8  (out of 9....I am not the quickest learner) 
+## What is an LSTM model?
 
-#### &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*How can I **actually** build something with one of these models?*
+A long short-term memory ([LSTM](https://en.wikipedia.org/wiki/Recurrent_neural_network)) model is a [recurrent neural network](https://en.wikipedia.org/wiki/Recurrent_neural_network) which incorporates a temporal aspect of the information that trains the model. Basically, past information will impact what the model is learning now. 
 
-Learning how to create an analytic model is one thing...however I wanted something more tangible...an **application** if you will. 
-Even if it is silly.
+In this way we will essentially *teach* English to the analytical model. At least it will be the english as derived from the writings of [Friedrich Nietzsche](http://www.gutenberg.org/ebooks/author/779).
 
-Previously, when I spent time studying machine learning there were many resources that walk you through the model:
+The following article, [Understanding LSTM Networks](http://colah.github.io/posts/2015-08-Understanding-LSTMs/) is a great description of LSTM networks in more depth. 
 
-<img src="{{site.baseurl}}/assets/images/build_train.jpg" alt="build and train" width="400"/>
+I think a key highlight from the article is that LSTMs are a special type of neural network which allow for information to be retained...and forgotten...as needed.
 
-However I wanted something more like this:
+>Humans don’t start their thinking from scratch every second. As you read this essay, you understand each word based on your understanding of previous words. You don’t throw everything away and start thinking from scratch again. Your thoughts have persistence.
 
-<img src="{{site.baseurl}}/assets/images/build_train_serve_interact.jpg" alt="build , train, serve and interact" width="400"/>
+>Recurrent neural networks address this issue. They are networks with loops in them, allowing information to persist.
 
-#### &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*This would allow me to not only **make** a working model, but to **use** it*
+Ok...so now we have a very basic idea of what an LSTM is….
 
-So with this set of posts we will explore the build and implementation of a machine learning model. 
-With the intent of using and learning about many tools along the way: Google Colaboratory, Google Cloud Platform, Kubernetes, Cloud Functions, Stackdriver, Computer Engine, Cloud ML, etc. 
 
-So if you are ready...let's dive right in...
+## What are we going to do?
 
-### Start the Build
+Well let’s walk through the steps of building a generative model using LSTM, just like in the book; however
+
+#### &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*Let's **actually** build a web app to generate text in real time*
+
+We are going to use Python, Keras and Google Colaboratory to build the code. Furthermore we will leverage Google Cloud Platform, Kubernetes, Cloud Functions, Stackdriver, Computer Engine, and some other tools to build the application.
+
+## Why?
+
+Simple. To learn. What started as a experiment to learn how to build an analytical model expanded into a project involving all the steps to implement an application. 
+
+My hope with this set of posts is that someone would find them useful to learn just as I did. 
+
+## Who is the audience?
+
+The ideal audience to this set of blogs would be someone who has had some experience with python, machine learning and Google Cloud Platform and likewise, wants to learn some steps along the way.
+
+So if you are ready…let’s dive right in…
+
+# Start the Build
+
+
 
 #### Where to build?
 I wanted an environment that worked from me. I wanted to satisfy these three requirements:
