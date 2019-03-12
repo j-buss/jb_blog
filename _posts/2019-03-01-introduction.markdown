@@ -15,79 +15,83 @@ What do you get when you combine a German philosopher and some AI..
 <img src="{{ site.baseurl }}/assets/images/robot.png" style="width: 48%; margin-right: 1%; margin-bottom: 0.5em;" title="Bilboq [Public domain], via Wikimedia Commons">
 </p>
 
-# Introduction
+## Introduction
 
 This all started when I wanted to learn about deep learning. I was following along with the exercises in the book [Deep Learning with Python by François Chollet][DLwP_Book]. 
 
 When I got to Chapter 8 - Generative deep learning François had a great example of creating text with a model after being trained on a corpus of text.
-It was fascinating working through all the code. However I wanted a way to create something more than just reproducing code. I wanted to make an **application**...something I could interact with.
+It was fascinating working through all the code. However I wanted a way to create something more than just reproducing code. 
+
+#### &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*I wanted to make an **application**...something I could interact with*
 
 So that was how my journey began to build a text generating application using an LSTM model.
 
-## What is an LSTM model?
+### What is an LSTM model?
 
 A long short-term memory ([LSTM](https://en.wikipedia.org/wiki/Recurrent_neural_network)) model is a [recurrent neural network](https://en.wikipedia.org/wiki/Recurrent_neural_network) which incorporates a temporal aspect of the information that trains the model. Basically, past information will impact what the model is learning now. 
 
 In this way we will essentially *teach* English to the analytical model. At least it will be the english as derived from the writings of [Friedrich Nietzsche](http://www.gutenberg.org/ebooks/author/779).
 
-The following article, [Understanding LSTM Networks](http://colah.github.io/posts/2015-08-Understanding-LSTMs/) is a great description of LSTM networks in more depth. 
-
-I think a key highlight from the article is that LSTMs are a special type of neural network which allow for information to be retained...and forgotten...as needed.
+Basically an LSTM is a way of training a neural network to retain information...and forget it...as needed
 
 >Humans don’t start their thinking from scratch every second. As you read this essay, you understand each word based on your understanding of previous words. You don’t throw everything away and start thinking from scratch again. Your thoughts have persistence.
 
 >Recurrent neural networks address this issue. They are networks with loops in them, allowing information to persist.
+If you would like a much deeper understanding of LSTM please the following article: [Understanding LSTM Networks](http://colah.github.io/posts/2015-08-Understanding-LSTMs/) is a great description of LSTM networks in more depth. 
 
 Ok...so now we have a very basic idea of what an LSTM is….
 
-
-## What are we going to do?
+### What are we going to do?
 
 Well let’s walk through the steps of building a generative model using LSTM, just like in the book; however
 
 #### &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*Let's **actually** build a web app to generate text in real time*
 
-We are going to use Python, Keras and Google Colaboratory to build the code. Furthermore we will leverage Google Cloud Platform, Kubernetes, Cloud Functions, Stackdriver, Computer Engine, and some other tools to build the application.
+We are going to use Python, Keras and Google Colaboratory to build the code. Furthermore we will leverage Google Cloud Platform, Kubernetes, Cloud Functions, Stackdriver, Compute Engine, and some other tools to build the application.
 
-## Why?
+### Why?
 
 Simple. To learn. What started as a experiment to learn how to build an analytical model expanded into a project involving all the steps to implement an application. 
 
 My hope with this set of posts is that someone would find them useful to learn just as I did. 
 
-## Who is the audience?
+### Who is the audience?
 
 The ideal audience to this set of blogs would be someone who has had some experience with python, machine learning and Google Cloud Platform and likewise, wants to learn some steps along the way.
 
 So if you are ready…let’s dive right in…
 
-# Start the Build
+## Start the Build
 
-
-
-#### Where to build?
-I wanted an environment that worked from me. I wanted to satisfy these three requirements:
-
-1. Use a “widely” regarded development framework
-2. Leverage a “cloud” development environment
-3. Save code in an online repository
+Early in this project I wanted to use a development environment that satisfied the following three requirements:
+1. Use a well-known development framework
+2. Cloud only environment
+3. Save the code in an online repository
 
 Using Google’s [Colaboratory](https://colab.research.google.com/) satisfies all three of these requirements. 
 It uses  
-[Jupyter](https://jupyter.org/) notebooks, which are ubiquitess in the analytics community,
-hosted on Google's infrastructure so it can be used from anywhere and it allows you to save your code in either Google Drive or Github. 
+[Jupyter](https://jupyter.org/) notebooks, which are ubiquitess in the analytics community.
+It is hosted on Google's infrastructure so it can be used from anywhere and it allows you to save your code in either Google Drive or Github. 
 
+As the [Colab FAQ](https://research.google.com/colaboratory/faq.html) describes:
+>Colaboratory is a research tool for machine learning education and research. It’s a Jupyter notebook environment that requires no setup to use.
 
-When you open up the Colab environment the default screen contains a “Getting Started” section that will walk 
-you through many introductory steps to perform. 
+### Colaboratory
 
-<img src="{{site.baseurl}}/assets/images/welcome_colaboratory.png" alt="Welcome to Google Colaboratory" width="800"/>
+When you open up the colab environment for the first time you will likely come to the "Welcome to Colaboratory" screen.
 
-For many individuals who have used Jupyter notebooks in the past this will be very familiar.
+<img src="{{site.baseurl}}/assets/images/welcome_to_colaboratory.png" alt="Welcome to Google Colaboratory" width="800"/>
 
-This this introduction we will just load one of the jupyter notebooks that Francois has made available in his accompanying Github account.
+For these tutorials we will only describe the most basic of the functionality for colaboratory for code execution.
+If you have not used Jupyter notebooks before feel free to walk through the introductory notebook as it will teach you many aspects of the environment.
+There are two main sections to the Colab window.
+1. Side Panel
+2. Code Panel
+The *side panel* contains a table of contents, example code snippets and a file explorer. While we will not have much use of these tools for the current tutorial there are some really powerful components to be found there.
 
-## Load a Notebook from GitHub
+<img src="{{site.baseurl}}/assets/images/welcome_to_colaboratory_side_panel.png" alt="Welcome to Google Colaboratory - Side Panel" width="800"/>
+
+### Load a Notebook from GitHub
 
 Within Colab if you are looking to leverage a jupyter notebook directly from Github you can enter a url for the notebook in question with a colab preference and it will lode directly.
 
