@@ -87,9 +87,12 @@ If you have not used Jupyter notebooks before feel free to walk through the intr
 There are two main sections to the Colab window.
 1. Side Panel
 2. Code Panel
-The *side panel* contains a table of contents, example code snippets and a file explorer. While we will not have much use of these tools for the current tutorial there are some really powerful components to be found there.
 
+The *side panel* contains a table of contents, example code snippets and a file explorer. While we will not have much use of these tools for the current tutorial there are some really powerful components to be found there.
+<figure>
 <img src="{{site.baseurl}}/assets/images/welcome_to_colaboratory_side_panel.png" alt="Welcome to Google Colaboratory - Side Panel" width="800"/>
+<figcaption>Google Colaboratory Side Panel</figcaption>
+</figure>
 
 ### Load a Notebook from GitHub
 
