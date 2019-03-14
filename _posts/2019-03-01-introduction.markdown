@@ -88,11 +88,17 @@ There are two main sections to the Colab window.
 1. Side Panel
 2. Code Panel
 
-The *side panel* contains a table of contents, example code snippets and a file explorer. While we will not have much use of these tools for the current tutorial there are some really powerful components to be found there.
+The **Side Panel** contains a table of contents, example code snippets and a file explorer. While we will not have much use of these tools for the current tutorial there are some really powerful components to be found there.
 
 {% include image.html file="welcome_to_colaboratory_side_panel.png" description="Google Colaboratory Side Panel" %}
 
-### Load a Notebook from GitHub
+The **Code Panel** is the area of the screen which we will spend most of our time. This area allows us to write and execute pieces of code.
+
+{% include image.html file="welcome_to_colaboratory_code_panel.png" description="Google Colaboratory Code Panel" %}
+
+Now that you have the most basic aspects of the Colaboratory...let's do something use and *load* an existing notebook.
+
+### Open a Notebook from GitHub
 
 Within Colab if you are looking to leverage a jupyter notebook directly from Github you can enter a url for the notebook in question with a colab preference and it will lode directly.
 
