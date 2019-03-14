@@ -80,7 +80,7 @@ As the [Colab FAQ](https://research.google.com/colaboratory/faq.html) describes:
 
 When you open up the colab environment for the first time you will likely come to the "Welcome to Colaboratory" screen.
 
-<img src="{{site.baseurl}}/assets/images/welcome_to_colaboratory.png" alt="Welcome to Google Colaboratory" width="800"/>
+{% include image.html file="welcome_to_colaboratory.png" description="Welcome to Colaboratory! Notebook" %}
 
 For these tutorials we will only describe the most basic of the functionality for colaboratory for code execution.
 If you have not used Jupyter notebooks before feel free to walk through the introductory notebook as it will teach you many aspects of the environment.
@@ -89,10 +89,8 @@ There are two main sections to the Colab window.
 2. Code Panel
 
 The *side panel* contains a table of contents, example code snippets and a file explorer. While we will not have much use of these tools for the current tutorial there are some really powerful components to be found there.
-<figure>
-<img src="{{site.baseurl}}/assets/images/welcome_to_colaboratory_side_panel.png" alt="Welcome to Google Colaboratory - Side Panel" width="800"/>
-<figcaption>Google Colaboratory Side Panel</figcaption>
-</figure>
+
+{% include image.html file="welcome_to_colaboratory_side_panel.png" description="Google Colaboratory Side Panel" %}
 
 ### Load a Notebook from GitHub
 
@@ -105,6 +103,7 @@ This opens a prompt box allowing you to paste the address of the specific notebo
 (In this picture I have simply pasted the link: 
 https://github.com/fchollet/deep-learning-with-python-notebooks/blob/master/8.1-text-generation-with-lstm.ipynb )
 
+{% include image.html file="welcome_to_colaboratory_side_panel.png" description="Google Colaboratory Side Panel" %}
 
 <img src="{{site.baseurl}}/assets/images/dlwp_colab_to_github_01.png" alt="Connect Google Colaboratory to Github" width="800"/>
 
