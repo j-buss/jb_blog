@@ -100,16 +100,11 @@ Now that you have the most basic aspects of the Colaboratory...let's do somethin
 
 ### Open a Notebook from GitHub
 
-Within Colab if you are looking to leverage a jupyter notebook directly from Github you can enter a url for the notebook in question with a colab preference and it will lode directly.
+Within Colab we are going to open a notebook that François Chollet made available in the Github repo accompanying the book: [deep-learning-with-python-notebooks](https://github.com/fchollet/deep-learning-with-python-notebooks).
 
-For example - we want to load the following notebook in colab: 8.1-text-generation-with-lstm.ipynb 
+Specifically we will be loading the notebook for section [8.1 Text generation with LSTM](https://github.com/fchollet/deep-learning-with-python-notebooks/blob/master/8.1-text-generation-with-lstm.ipynb)
 
-We can simply go to the following url:  http://colab.research.google.com/github 
-This opens a prompt box allowing you to paste the address of the specific notebook hosted on github
-(In this picture I have simply pasted the link: 
-https://github.com/fchollet/deep-learning-with-python-notebooks/blob/master/8.1-text-generation-with-lstm.ipynb )
-
-{% include image.html file="welcome_to_colaboratory_side_panel.png" description="Google Colaboratory Side Panel" %}
+{% include image.html file="dlwp_github_8_1_notebook.png" description="Deep Learning with Python - 8.1 Text generation with LSTM" %}
 
 <img src="{{site.baseurl}}/assets/images/dlwp_colab_to_github_01.png" alt="Connect Google Colaboratory to Github" width="800"/>
 
