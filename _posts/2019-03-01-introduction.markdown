@@ -104,9 +104,11 @@ Within Colab we are going to open a notebook that François Chollet made availab
 
 Specifically we will be loading the notebook for section [8.1 Text generation with LSTM](https://github.com/fchollet/deep-learning-with-python-notebooks/blob/master/8.1-text-generation-with-lstm.ipynb)
 
-{% include image.html file="dlwp_github_8_1_notebook.png" description="Deep Learning with Python - 8.1 Text generation with LSTM" %}
+{% include image.html file="dlwp_github_8_1_notebook.png" %}
 
-<img src="{{site.baseurl}}/assets/images/dlwp_colab_to_github_01.png" alt="Connect Google Colaboratory to Github" width="800"/>
+Colab gives us a great way to load a notebook from github. Within colab select “File”:
+
+{% include image.html file="colab_file.png" description="Notebook file" %}
 
 When you click off of the entry blank the colab interogates the inforamtion and loads the informaitotn pertaining to the repository:
 
