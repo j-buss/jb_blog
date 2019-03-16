@@ -78,9 +78,9 @@ As the [Colab FAQ](https://research.google.com/colaboratory/faq.html) describes:
 
 ### Colaboratory
 
-When you open up the colab environment for the first time you will likely come to the "Welcome to Colaboratory" screen.
+When you open up the colab environment for the first time you will likely come to the "Welcome to Colaboratory" screen.  
 
-{% include image.html file="welcome_to_colaboratory.png" description="Welcome to Colaboratory! Notebook" %}
+{% include image.html file="welcome_to_colaboratory.png" description="Welcome to Colaboratory! Notebook" %}  
 
 For these tutorials we will only describe the most basic of the functionality for colaboratory for code execution.
 If you have not used Jupyter notebooks before feel free to walk through the introductory notebook as it will teach you many aspects of the environment.
@@ -108,27 +108,48 @@ Specifically we will be loading the notebook for section [8.1 Text generation wi
 
 Colab gives us a great way to load a notebook from github. Within colab select “File”:
 
-{% include image.html file="colab_file.png" description="Notebook file" %}
+{% include image.html file="colab_file.png"%}
 
-When you click off of the entry blank the colab interogates the inforamtion and loads the informaitotn pertaining to the repository:
+Then select "Open notebook...":
 
-<img src="{{site.baseurl}}/assets/images/dlwp_colab_to_github_02.png" alt="Connect Google Colaboratory to Github" width="800"/>
+{% include image.html file="colab_open_notebook.png"%}
 
-Simply click the “Open notebook in new tab” button to start editing the code:
+A screen opens up allowing you to load a notebook from a number of different sources. Select “GITHUB”:
 
-<img src="{{site.baseurl}}/assets/images/dlwp_colab_to_github_03.png" alt="Connect Google Colaboratory to Github" width="800"/>
+{% include image.html file="colab_open_github_notebook_01.png"%}
 
-The notebook will open:
+Then paste the notebook you would like to open in the “Search” field:
 
-<img src="{{site.baseurl}}/assets/images/dlwp_notebook_01.png" alt="Deep Learning with Python Notebook" width="800"/>
+{% include image.html file="colab_open_github_paste_location.png"%}
 
-Save your notebook to Github:
+After you click off the field it will resolve the notebook and find it:
 
-<img src="{{site.baseurl}}/assets/images/text_gen_lstm_save_to_github.png" alt="Save Google Colaboratory Notebook to Github" width="800"/>
 
-If this is your first time saving from Colab to Github you may need to authorize your
+{% include image.html file="colab_open_github_resolved_filename.png"%}
 
-<img src="{{site.baseurl}}/assets/images/authorize_colaboratory.png" alt="Authorize Colaboratory to Github" width="800"/>
+Select the “Open notebook in new tab…” icon:
+
+{% include image.html file="colab_open_github_notebook_open_in_new_tab.png"%}
+
+Alright. Now we have the notebook loaded from François Chollet’s github repo and we are ready to execute it. Let’s try it! 
+
+### Execute the notebook
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 {% highlight shell %} 
 git clone https://github.com/fchollet/deep-learning-with-python-notebooks.git
