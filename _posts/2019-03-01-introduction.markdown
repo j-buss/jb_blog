@@ -135,9 +135,21 @@ Alright. Now we have the notebook loaded from François Chollet’s github repo 
 
 ### Execute the notebook
 
+So you should have the notebook loaded in Colab and it should look something like this…
 
+{% include image.html file="dlwp_notebook_02.png"%}
 
+Each one of the *sections* of the notebook is called a *cell*. A *cell* can have code in it (as you would imagine); 
 
+{% include image.html file="notebook_code_cell_selected.png"%}
+
+however it can also have [Markdown Text](https://jupyter-notebook.readthedocs.io/en/stable/examples/Notebook/Working%20With%20Markdown%20Cells.html) in it:
+
+{% include image.html file="notebook_markdown_cell_selected.png"%}
+
+You can execute the code within each cell by using the key-stroke *Shift+Enter*.
+
+{% include image.html file="notebook_execution_result.png"%}
 
 
 
