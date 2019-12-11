@@ -4,7 +4,7 @@ date: 2019-12-10T05:52:36-06:00
 draft: false
 ---
 
-![Headshot](/img/about/jb_headshot.jpg)
+![Headshot](/blog/img/about/jb_headshot.jpg)
 My name is Jeremy Buss. Throughout my life I have been inquisitive about the world.
 This passion manifested early as a love of reading. Spending most evenings after school reading anything I could get my hands on.
 I loved reading stories about people and how they grew up and made an impact. 
