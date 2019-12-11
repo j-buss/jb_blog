@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>jrem.me</title>
+    <link>https://j-buss.github.io/jb_blog/</link>
+    <description>Recent content on jrem.me</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 10 Dec 2019 05:52:36 -0600</lastBuildDate>
+    
+	<atom:link href="https://j-buss.github.io/jb_blog/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>About</title>
+      <link>https://j-buss.github.io/jb_blog/about/</link>
+      <pubDate>Tue, 10 Dec 2019 05:52:36 -0600</pubDate>
+      
+      <guid>https://j-buss.github.io/jb_blog/about/</guid>
+      <description>My name is Jeremy Buss and throughout my life I have been drawn to investigate the world around me. This passion manifested early as a love of reading - tapping into the wisdom of those who came before me. Later in high school and college this blossomed into the love of all things science and pursuing and education in physics.
+This site is personal journey to hold me accountable to live my two principles:</description>
+    </item>
+    
+  </channel>
+</rss>
