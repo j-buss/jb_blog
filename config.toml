@@ -1,0 +1,48 @@
+baseURL = "https://j-buss.github.io/jb_blog/"
+languageCode = "en-us"
+title = "jrem.me"
+theme = "ananke"
+#theme = "ga-hugo-theme"
+
+[params]
+    author = "Jeremy Buss"
+    description = "Personal website of Jeremy Buss"
+    keywords = "data,blog,developer"
+    info = "Data Analyst and Cloud Engineer"
+    footercontent = "It is a capital mistake to theorize before one has data. — Sherlock Holmes"
+
+    hideCredits = false
+    hideCopyright = false
+
+    rtl = false
+
+    # Custom CSS
+    custom_css = []
+
+[[params.social]]
+    name = "Github"
+    icon = "fab fa-github fa-2x"
+    weight = 1
+    url = "https://github.com/j-buss"
+[[params.social]]
+    name = "LinkedIn"
+    icon = "fab fa-linkedin fa-2x"
+    weight = 2
+    url = "https://www.linkedin.com/in/jeremybuss"
+
+[[menu.main]]
+    name = "Blog"
+    weight = 1
+    url  = "/posts/"
+[[menu.main]]
+    name = "About"
+    weight = 2
+    url = "/about/"
+#[[menu.main]]
+#    name = "Projects"
+#    weight = 3
+#    url = "/projects/"
+#[[menu.main]]
+#    name = "Contact me"
+#    weight = 5
+#    url = "/contact/"
