@@ -1,21 +1,17 @@
 ---
 title: "Simple Flask Example"
 date: 2019-12-13T08:00:00-00:00
-draft: true
+draft: false
 ---
 
 # Deploying Flask Apps into Google Cloud Platform
 
-There are many Flask tutorials online that describe the details of using the lightweight Python framework.pyi
-With this series I do not intend to recreate the great jobs that have been done.
-I simply wanted a quick (2 or 3) post series to get up and running with deploying Flask to
+There are many Flask tutorials online that describe the details of using the lightweight Python framework. With this series I do not intend to recreate the exhaustive tutorials that have been done. I simply wanted a quick 3 post series to get up and running with deploying Flask to
 GCP App Engine and using data from Big Query.
-
 
 ## Part 1: Creating Your First Flask App
 
-Let's take a simple Flask app and make certain that we can deploy it to GCP. Essentially we will take the "5-line minimum" 
-and add a few other items to be able to deploy it to GCP App Engine.
+Let's take a simple Flask app and deploy it to GCP. Essentially we will take the "5-line minimum" and add a few other items in order to deploy it to GCP App Engine.
 
 ### 1. Minimum app tested locally:
 Install Flask:
@@ -93,3 +89,5 @@ is a Google Cloud Codelabs walk-through describing each of the steps to deploy a
 
 #### Podcast:
 - [Building Flask-based Web Apps](https://talkpython.fm/episodes/show/48/building-flask-based-web-apps) is a podcast interview on [Talk Python to Me]()
+
+<script src="/jb_blog/js/copy-code-button.js"></script>
