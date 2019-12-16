@@ -3,12 +3,22 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>https://j-buss.github.io/jb_blog/about/</loc>
-    <lastmod>2019-12-10T05:52:36-06:00</lastmod>
+    <loc>https://j-buss.github.io/jb_blog/</loc>
+    <lastmod>2019-12-13T08:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://j-buss.github.io/jb_blog/</loc>
+    <loc>https://j-buss.github.io/jb_blog/posts/</loc>
+    <lastmod>2019-12-13T08:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://j-buss.github.io/jb_blog/posts/flask/simple_flask_local/</loc>
+    <lastmod>2019-12-13T08:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://j-buss.github.io/jb_blog/about/</loc>
     <lastmod>2019-12-10T05:52:36-06:00</lastmod>
   </url>
   
