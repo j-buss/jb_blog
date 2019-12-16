@@ -90,4 +90,4 @@ is a Google Cloud Codelabs walk-through describing each of the steps to deploy a
 #### Podcast:
 - [Building Flask-based Web Apps](https://talkpython.fm/episodes/show/48/building-flask-based-web-apps) is a podcast interview on [Talk Python to Me]()
 
-<script src="/jb_blog/js/copy-code-button.js"></script>
+{{< code-clipboard >}}
