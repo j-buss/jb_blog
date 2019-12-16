@@ -43,12 +43,21 @@ If all went well we should get a output like the following:
 
 ### 2. Run the app in GCP:
 
-- deploy to gcp
-    rename app.py to main.py
-    - without a module named main it will error out....
-    - cp app.py as main.py
-- Change the code a little...
-```python
+With a working local copy from the last section we need to make a few changes so that it can run on GCP. 
+
+#### Rename app.py to main.py
+
+GCP expects the flask app to be called main.py. Without a module named "main" it will error.
+
+```bash
+mv app.py main.py
+```
+ 
+#### Modify the code slightly
+
+We need to add a main block which will be the entry point when the app is executed from GCP. Additionally, we are setting the port number to be used for the webserver to 8080 for testing.
+
+```python {hl_lines=["7-8"]}
 from flask import Flask
 app = Flask(__name__)
 
@@ -57,13 +66,20 @@ def hello():
     return "Hello World!"
 if __name__ == '__main__':
     app.run(port=8080)
+``` 
 
-```
-create the app.yaml file
+#### app.yaml
+
+We also need to make one more file for GCP App Engine to know how to load the application we just made. The [app.yaml](https://cloud.google.com/appengine/docs/standard/python3/config/appref) file will contain the language and that we would like to use [gunicorn](https://gunicorn.org/) as our WSGI. 
+
 ```python
 runtime: python37
 entrypoint: gunicorn -b :$PORT main:app
 ```
+#### Deploy
+
+To deploy the App Engine application we will use the GCP SDK from the command line. As such we need to have an active project.
+
 ```bash
 gcloud config set project [PROJECT_NAME]
 ```
