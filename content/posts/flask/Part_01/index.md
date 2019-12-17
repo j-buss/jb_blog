@@ -1,13 +1,23 @@
 ---
-title: "Simple Flask Example"
+title: "Simple Flask Example - Part 1"
 date: 2019-12-13T08:00:00-00:00
 draft: false
 ---
 
 # Deploying Flask Apps into Google Cloud Platform
 
-There are many Flask tutorials online that describe the details of using the lightweight Python framework. With this series I do not intend to recreate the exhaustive tutorials that have been done. I simply wanted a quick 3 post series to get up and running with deploying Flask to
+There are many Flask tutorials online that describe the details of using the lightweight Python framework. With this series I do not intend to recreate the exhaustive tutorials that have been done. I simply wanted a quick 3-post series to get up and running with deploying Flask to
 GCP App Engine and using data from Big Query.
+
+Within this post, Part 1, we will create a Flask app locally and then push it to GCP App Engine.
+
+#### Assumptions:
+- Familiarity with Python
+- Familiarity with Google Cloud Platform
+- Access to a GCP Project with ability to deploy App Engine
+- Linux working environment 
+  - This tutorial leverages GCP Cloud Shell
+  - Steps are not dependent on Linux, but haven't been tested in other environments
 
 ## Part 1: Creating Your First Flask App
 
@@ -45,14 +55,6 @@ If all went well we should get a output like the following:
 
 With a working local copy from the last section we need to make a few changes so that it can run on GCP. 
 
-#### Rename app.py to main.py
-
-GCP expects the flask app to be called main.py. Without a module named "main" it will error.
-
-```bash
-mv app.py main.py
-```
- 
 #### Modify the code slightly
 
 We need to add a main block which will be the entry point when the app is executed from GCP. Additionally, we are setting the port number to be used for the webserver to 8080 for testing.
@@ -70,12 +72,16 @@ if __name__ == '__main__':
 
 #### app.yaml
 
-We also need to make one more file for GCP App Engine to know how to load the application we just made. The [app.yaml](https://cloud.google.com/appengine/docs/standard/python3/config/appref) file will contain the language and that we would like to use [gunicorn](https://gunicorn.org/) as our WSGI. 
+We also need to make one more file for GCP App Engine to know how to load the application we just made. The following is our minmal version of the app.yaml file:
 
 ```python
 runtime: python37
 entrypoint: gunicorn -b :$PORT main:app
 ```
+
+We will be using the [gunicorn](https://gunicorn.org/) tool as our WSGI. Additional information about the app.yaml can be found at the following: 
+ https://cloud.google.com/appengine/docs/standard/python3/config/appref
+
 #### Deploy
 
 To deploy the App Engine application we will use the GCP SDK from the command line. As such we need to have an active project.
@@ -83,13 +89,46 @@ To deploy the App Engine application we will use the GCP SDK from the command li
 ```bash
 gcloud config set project [PROJECT_NAME]
 ```
-enable cloud build api
+
+Now it is time to perform the deployment:
+
 ```bash
 gcloud app deploy
 ```
-If it went well we should receive the following...
-#### INSERT PICTURE AND RETURN MESSAGE
+You will receive a few prompts to finish the deployment to App Engine.
+
+##### Select Region:
+
+{{< img src="app_engine_select_region.png" alt="Select Region" >}}
+
+##### Confirmation
+
+{{< img src="confirm_app_engine_deploy.png" alt="Simple Flask running locally" >}} 
+
+##### Status Message
+
+{{< img src="app_engine_deploy_summary.png" alt="App Engine Deployment Summary Message" >}}
+
+#### Test the App
+
+Go Into the GCP Console and select the link to the default application:
+
+{{< img src="app_engine_console.png" alt="App Engine Console" >}}
+
+If all goes well you should see the following:
+
+{{< img src="flask_app_running_app_engine.png" alt="Simple Flask App Running on GCP App Engine" >}}
+
+### Next Steps:
+
+Ok that was a pretty easy one. In the next post we will look using our flask app to pull data from BigQuery!
+
+---
+
 ### Resources:
+#### Code
+- All the code can be found in my github: 
+    - https://github.com/j-buss/example_flask
 #### Tutorials
 - [Flask Mega Tutorial](https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world)
  : The Flask Tutorial Gold Standard. In a clear and consistent format it walks you through all the basics and well into the intermediate range.
