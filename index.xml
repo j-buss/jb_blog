@@ -12,13 +12,13 @@
     
     
     <item>
-      <title>Simple Flask Example</title>
-      <link>https://j-buss.github.io/jb_blog/posts/flask/simple_flask_local/</link>
+      <title>Simple Flask Example - Part 1</title>
+      <link>https://j-buss.github.io/jb_blog/posts/flask/part_01/</link>
       <pubDate>Fri, 13 Dec 2019 08:00:00 +0000</pubDate>
       
-      <guid>https://j-buss.github.io/jb_blog/posts/flask/simple_flask_local/</guid>
-      <description>Deploying Flask Apps into Google Cloud Platform There are many Flask tutorials online that describe the details of using the lightweight Python framework. With this series I do not intend to recreate the exhaustive tutorials that have been done. I simply wanted a quick 3 post series to get up and running with deploying Flask to GCP App Engine and using data from Big Query.
-Part 1: Creating Your First Flask App Let&#39;s take a simple Flask app and deploy it to GCP.</description>
+      <guid>https://j-buss.github.io/jb_blog/posts/flask/part_01/</guid>
+      <description>Deploying Flask Apps into Google Cloud Platform There are many Flask tutorials online that describe the details of using the lightweight Python framework. With this series I do not intend to recreate the exhaustive tutorials that have been done. I simply wanted a quick 3-post series to get up and running with deploying Flask to GCP App Engine and using data from Big Query.
+Within this post, Part 1, we will create a Flask app locally and then push it to GCP App Engine.</description>
     </item>
     
     <item>
