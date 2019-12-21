@@ -1,12 +1,12 @@
 ---
-title: "Flask Example - Part 2 - Reading BigQuery"
+title: "Flask Part 2 - Reading BigQuery"
 date: 2019-12-21T05:54:03-06:00
 draft: true
 ---
 
-# Reading Bigquery from Simple Flask App in GCP
+# Deploying Flask Apps into Google Cloud Platform
 
-This is a continuation from the previous post {{< ref "/flask/Part_01/index.md" >}}. In this post we will extend the simple Flask App and read some data from a public dataset in BigQuery.
+This is a continuation from the previous post [Flask Part 1 - Simple App]({{< ref "/posts/flask/Part_01/index.md" >}}). In this post we will extend the simple Flask App and read some data from a public dataset in BigQuery.
 
 #### Assumptions:
 - Familiarity with Python
@@ -15,110 +15,40 @@ This is a continuation from the previous post {{< ref "/flask/Part_01/index.md" 
 - Linux working environment 
   - This tutorial leverages GCP Cloud Shell
   - Steps are not dependent on Linux, but haven't been tested in other environments
+- Also, I am assuming you have followed along with the previous post: [Flask Part 1 - Simple App]({{< ref "/posts/flask/Part_01/index.md" >}})
 
-## Part 1: Creating Your First Flask App
+## Part 2: Read BigQuery
 
-Let's take a simple Flask app and deploy it to GCP. Essentially we will take the "5-line minimum" and add a few other items in order to deploy it to GCP App Engine.
+In order to read data from BigQuery we need to:
+1. Load BigQuery Libraries
+2. Edit App to __Read__ BigQuery
+3. Edit App to __Display__ Data
 
-### 1. Minimum app tested locally:
-Install Flask:
-```bash
-pip install flask
-```
-Create the "5-line minimum" main.py file:  
-```python
-from flask import Flask
-app = Flask(__name__)
+Just like last post we will take this in steps. We will test it locally and then in GCP.
 
-@app.route("/")
-def hello():
-    return "Hello World!"
-```
-This file is the only code needed. 
-flask is a script...so we will execute it with a simple `flask run` command. 
-However we need to set an environment variable first.
- ```bash
-export FLASK_APP=main.py
-```
-Now we are ready to run it:
-```bash
-flask run
- ```
-If all went well we should get a output like the following:
+#### 1. Load BigQuery Libraries
 
-{{< img src="simple_flask_run_locally.png" alt="Simple Flask running locally" >}}
+In order to use BigQuery we will need to install the Python BigQuery library into our environment:
 
-### 2. Run the app in GCP:
-
-With a working local copy from the last section we need to make a few changes so that it can run on GCP. 
-
-#### Modify the code slightly
-
-We need to add a main block which will be the entry point when the app is executed from GCP. Additionally, we are setting the port number to be used for the webserver to 8080 for testing.
-
-```python {hl_lines=["7-8"]}
-from flask import Flask
-app = Flask(__name__)
-
-@app.route("/")
-def hello():
-    return "Hello World!"
-if __name__ == '__main__':
-    app.run(port=8080)
-``` 
-
-#### app.yaml
-
-We also need to make one more file for GCP App Engine to know how to load the application we just made. The following is our minmal version of the app.yaml file:
-
-```python
-runtime: python37
-entrypoint: gunicorn -b :$PORT main:app
+```shell script
+pip install google-cloud-bigquery
 ```
 
-We will be using the [gunicorn](https://gunicorn.org/) tool as our WSGI. Additional information about the app.yaml can be found at the following: 
- https://cloud.google.com/appengine/docs/standard/python3/config/appref
+Well...that was easy. Unfortunately the next two steps are much more involved.
 
-#### Deploy
+### 2. Edit App to Read BigQuery
 
-To deploy the App Engine application we will use the GCP SDK from the command line. As such we need to have an active project.
+Now let's focus on a relatively simply query from a public BigQuery database. 
 
-```bash
-gcloud config set project [PROJECT_NAME]
+Update the requirements.txt file
+
+```shell script
+Flask==1.1.1
+google-cloud-bigquery==1.22.0
 ```
+### 3. Test it on GCP
 
-Now it is time to perform the deployment:
 
-```bash
-gcloud app deploy
-```
-You will receive a few prompts to finish the deployment to App Engine.
-
-##### Select Region:
-
-{{< img src="app_engine_select_region.png" alt="Select Region" >}}
-
-##### Confirmation
-
-{{< img src="confirm_app_engine_deploy.png" alt="Simple Flask running locally" >}} 
-
-##### Status Message
-
-{{< img src="app_engine_deploy_summary.png" alt="App Engine Deployment Summary Message" >}}
-
-#### Test the App
-
-Go Into the GCP Console and select the link to the default application:
-
-{{< img src="app_engine_console.png" alt="App Engine Console" >}}
-
-If all goes well you should see the following:
-
-{{< img src="flask_app_running_app_engine.png" alt="Simple Flask App Running on GCP App Engine" >}}
-
-### Next Steps:
-
-Ok that was a pretty easy one. In the next post we will look using our flask app to pull data from BigQuery!
 
 ---
 

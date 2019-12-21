@@ -1,5 +1,5 @@
 ---
-title: "Simple Flask Example - Part 1"
+title: "Flask Part 1 - Simple App"
 date: 2019-12-13T08:00:00-00:00
 draft: false
 ---
@@ -21,7 +21,7 @@ Given that this post pertains to very simple code you can easily type it all. Ho
   - This tutorial leverages GCP Cloud Shell
   - Steps are not dependent on Linux, but haven't been tested in other environments
 
-## Part 1: Creating Your First Flask App
+## Part 1: Simple App
 
 Let's take a simple Flask app and deploy it to GCP. Essentially we will take the "5-line minimum" and add a few other items in order to deploy it to GCP App Engine.
 
