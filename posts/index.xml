@@ -6,10 +6,47 @@
     <description>Recent content in Posts on jrem.me</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 13 Dec 2019 08:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 17 Dec 2019 16:09:33 -0600</lastBuildDate>
     
 	<atom:link href="https://j-buss.github.io/jb_blog/posts/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Copy Code to Clipboard</title>
+      <link>https://j-buss.github.io/jb_blog/posts/hugo-website/copy-code-clipboard/</link>
+      <pubDate>Tue, 17 Dec 2019 16:09:33 -0600</pubDate>
+      
+      <guid>https://j-buss.github.io/jb_blog/posts/hugo-website/copy-code-clipboard/</guid>
+      <description>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;style&gt;
+blockquote {
+    margin: 0;
+}
+
+blockquote p {
+    padding: 15px;
+    background: #eee;
+    border-radius: 5px;
+}
+
+blockquote p::before {
+    content: &#39;\201C&#39;;
+}
+
+blockquote p::after {
+    content: &#39;\201D&#39;;
+}
+&lt;/style&gt;
+&lt;blockquote cite=&#34;https://cloud.google.com/stackdriver/&#34;&gt;
+    &lt;p&gt;Imitation is not just the sincerest form of flattery - it&amp;#39;s the sincerest form of learning.&lt;/p&gt;
+    &lt;footer&gt;George Bernard Shaw&lt;/footer&gt;
+&lt;/blockquote&gt;
+&lt;/html&gt;
+
+&lt;h3 id=&#34;add-a-copy-to-clipboard-button-in-hugo&#34;&gt;Add a &amp;ldquo;Copy to Clipboard&amp;rdquo; button in Hugo&lt;/h3&gt;
+&lt;p&gt;One of the benefits of using open source software is the ability to learn from others. I have used that to my advantage over my career and want to make sure to pay it forward (in any small way I can).&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>Simple Flask Example - Part 1</title>
