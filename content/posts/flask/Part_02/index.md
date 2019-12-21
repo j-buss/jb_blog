@@ -1,17 +1,12 @@
 ---
-title: "Simple Flask Example - Part 1"
-date: 2019-12-13T08:00:00-00:00
-draft: false
+title: "Flask Example - Part 2 - Reading BigQuery"
+date: 2019-12-21T05:54:03-06:00
+draft: true
 ---
 
-# Deploying Flask Apps into Google Cloud Platform
+# Reading Bigquery from Simple Flask App in GCP
 
-There are many Flask tutorials online that describe the details of using the lightweight Python framework. With this series I do not intend to recreate the exhaustive tutorials that have been done. I simply wanted a quick 3-post series to get up and running with deploying Flask to
-GCP App Engine and using data from Big Query.
-
-Within this post, Part 1, we will create a Flask app locally and then push it to GCP App Engine.
-
-Given that this post pertains to very simple code you can easily type it all. However, feel free to get the code from my github: [example_flask - Part 1](https://github.com/j-buss/example_flask/tree/master/Part_01).
+This is a continuation from the previous post {{< ref "/flask/Part_01/index.md" >}}. In this post we will extend the simple Flask App and read some data from a public dataset in BigQuery.
 
 #### Assumptions:
 - Familiarity with Python
@@ -30,7 +25,7 @@ Install Flask:
 ```bash
 pip install flask
 ```
-Create the "5-line minimum" main_local.py file:  
+Create the "5-line minimum" main.py file:  
 ```python
 from flask import Flask
 app = Flask(__name__)
@@ -43,7 +38,7 @@ This file is the only code needed.
 flask is a script...so we will execute it with a simple `flask run` command. 
 However we need to set an environment variable first.
  ```bash
-export FLASK_APP=main_local.py
+export FLASK_APP=main.py
 ```
 Now we are ready to run it:
 ```bash
@@ -72,31 +67,17 @@ if __name__ == '__main__':
     app.run(port=8080)
 ``` 
 
-#### Add Two More Files
-We also need to make two more file for GCP App Engine to know how to load the application we just made: 
-1. app.yaml
-1. requirements.txt
+#### app.yaml
 
-##### 1. app.yaml
-
-There are many options you can add into the app.yaml file. We will simply be telling GCP what language we are using and the WSGI tool.
-We will be using the [gunicorn](https://gunicorn.org/) tool as our WSGI. Additional information about the app.yaml can be found at the following: 
- https://cloud.google.com/appengine/docs/standard/python3/config/appref
+We also need to make one more file for GCP App Engine to know how to load the application we just made. The following is our minmal version of the app.yaml file:
 
 ```python
 runtime: python37
 entrypoint: gunicorn -b :$PORT main:app
 ```
 
- 
-##### 2. requirements.txt
-
-The requirements file will contain the Python libraries that need to be loaded to be used in our application. We are using only two:
-
-```python
-Flask==1.1.1
-gunicorn
-```
+We will be using the [gunicorn](https://gunicorn.org/) tool as our WSGI. Additional information about the app.yaml can be found at the following: 
+ https://cloud.google.com/appengine/docs/standard/python3/config/appref
 
 #### Deploy
 
