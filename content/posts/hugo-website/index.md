@@ -1,7 +1,7 @@
 ---
 title: "Copy Code to Clipboard"
 date: 2019-12-17T16:09:33-06:00
-draft: true
+draft: false
 ---
 
 {{< simple_quotes quote="Imitation is not just the sincerest form of flattery - it's the sincerest form of learning." cite="George Bernard Shaw" >}}   
@@ -33,13 +33,12 @@ Place this file in your Hugo Static folder: <BLOG>/static/css
 {{< img src="post-css-image.png" >}}
 
 ### How to Use
-Danny does a great job describing the code, but the "where" to put the code was very confusing to me. (As I pointed out above, I am a new Hugo user...so I will admit the shortcoming is mine to overcome)
-
+So now that we have the javascript and css in place we still need to call the code for a given page. 
 
 #### Option 1: Partials (TBD)
-OK...I don't know how to do this one yet. I can search for the javascript in Danny's website files: [search for copy-code.js usage](https://github.com/dguo/dannyguo.com/search?q=copy-code-button.js&unscoped_q=copy-code-button.js)
+OK...I don't know how to do this one yet. I believe this is what Danny is using, but like I said I can't figure it out. I can search for the javascript in Danny's website files: [search for copy-code.js usage](https://github.com/dguo/dannyguo.com/search?q=copy-code-button.js&unscoped_q=copy-code-button.js)
 
-The code is getting called in a file: 
+I know that the code is getting called in a file: 
 
 layouts/blog/single.html
 ```html
@@ -49,12 +48,12 @@ layouts/blog/single.html
     {{ end  }}
 {{ end  }}
 ```
-However I find the logic of Hugo Themes/Partials/Templates very confusing. So at this point this option is a dead end (for me). Others will undoubtedly understand the steps to take, but I am not there yet.
+However I find the logic of Hugo Themes/Partials/Templates very confusing. So at this point this option is a dead end (for me). Others will undoubtedly understand the steps to take, but I am not there yet. If anyone stumbles across this post and wants to comment...feel free to reach out to me.
 
 #### Option 2: Shortcode (This one works!)
-Even though I couldn't figure out the whole Template/Partial deal I was able to just insert the code with a [Shortcode](https://gohugo.io/content-management/shortcodes/).
+Even though I couldn't figure out the whole Template/Partial framework I found the use of a [Shortcode](https://gohugo.io/content-management/shortcodes/) to be fairly straightforward. 
 
-Add the following code:
+Create a new shortcode by adding the following code:
 ```html
 <!DOCTYPE html>
 <html lang="en">
@@ -65,10 +64,11 @@ to a new file *code-clipboard.html* in the layouts/shortcodes folder:
 
 {{< img src="code-clipboard-folder-image.png" >}}
 
-Then in the blog markdown you simply add the following code to the bottom of the file:
+Then in any markdown file that you wish to have the button enabled you simply  add the following code to the bottom of that markdown file:
 ```html
 {{</* code-clipboard */>}}
 ```
+Then when the page is created through the Hugo publish process you will see the "copy" button enabled.
 
 ### Resources:
 
