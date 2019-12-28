@@ -4,18 +4,6 @@ date: 2019-12-22T10:25:54-06:00
 draft: false
 ---
 
-<style>
-table, th, td {
-      padding: 10px;
-      border: 1px solid black; 
-      border-collapse: collapse;
-}
-th{
-    background-color: grey;
-    color: white;
-}
-</style>
-
 With this post we will setup MLflow and experiment with the machine learning workflow. Specifically we will install MLflow on a compute engine in GCP.
 
 #### Assumptions:
@@ -39,6 +27,17 @@ In this post we won't specifically highlight the individual challenges, but simp
 #### Create Compute Engine
 I am assuming you have some familiarity with setting up GCP components. The following are the notable selections I made in setting up the server in the cloud:
 
+<style>
+table, th, td {
+      padding: 10px;
+      border: 1px solid black; 
+      border-collapse: collapse;
+}
+th{
+    background-color: grey;
+    color: white;
+}
+</style>
 
 Field|Value
 :-----:|:-----:
