@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    
+    <title>jrem.me  | MLflow on Google Cloud Platform</title>
+    <meta name="viewport" content="width=device-width,minimum-scale=1">
+    <meta name="generator" content="Hugo 0.60.1" />
+    
+    
+      <META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
+    
+
+    
+    
+      <link href="/jb_blog/dist/css/app.d98f2eb6bcd1eaedb7edf166bd16af26.css" rel="stylesheet">
+    
+
+    
+      <link rel="stylesheet" href="/jb_blog/css/post.css">
+    
+
+    
+      
+    
+
+    
+    
+    <meta property="og:title" content="MLflow on Google Cloud Platform" />
+<meta property="og:description" content="table, th, td { padding: 10px; border: 1px solid black; border-collapse: collapse; } th{ background-color: grey; color: white; }  With this post we will setup MLflow and experiment with the machine learning workflow. Specifically we will install MLflow on a compute engine in GCP.
+Assumptions:  Familiarity with Python, and scikit-learn Access to a linux system  While the steps below don&#39;t necessarily require linux they were performed on linux so I can&#39;t speak to the ability to perform on Windows or Mac OS   Google Cloud Platform familiarity and access to a GCP project  Part 1: Install MLFlow MLflow is an &ldquo;open source platform for the machine learning lifecycle&rdquo;." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://j-buss.github.io/jb_blog/posts/machine-learning/mlflow-introduction/" />
+<meta property="article:published_time" content="2019-12-22T10:25:54-06:00" />
+<meta property="article:modified_time" content="2019-12-22T10:25:54-06:00" />
+<meta itemprop="name" content="MLflow on Google Cloud Platform">
+<meta itemprop="description" content="table, th, td { padding: 10px; border: 1px solid black; border-collapse: collapse; } th{ background-color: grey; color: white; }  With this post we will setup MLflow and experiment with the machine learning workflow. Specifically we will install MLflow on a compute engine in GCP.
+Assumptions:  Familiarity with Python, and scikit-learn Access to a linux system  While the steps below don&#39;t necessarily require linux they were performed on linux so I can&#39;t speak to the ability to perform on Windows or Mac OS   Google Cloud Platform familiarity and access to a GCP project  Part 1: Install MLFlow MLflow is an &ldquo;open source platform for the machine learning lifecycle&rdquo;.">
+<meta itemprop="datePublished" content="2019-12-22T10:25:54-06:00" />
+<meta itemprop="dateModified" content="2019-12-22T10:25:54-06:00" />
+<meta itemprop="wordCount" content="1589">
+
+
+
+<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="MLflow on Google Cloud Platform"/>
+<meta name="twitter:description" content="table, th, td { padding: 10px; border: 1px solid black; border-collapse: collapse; } th{ background-color: grey; color: white; }  With this post we will setup MLflow and experiment with the machine learning workflow. Specifically we will install MLflow on a compute engine in GCP.
+Assumptions:  Familiarity with Python, and scikit-learn Access to a linux system  While the steps below don&#39;t necessarily require linux they were performed on linux so I can&#39;t speak to the ability to perform on Windows or Mac OS   Google Cloud Platform familiarity and access to a GCP project  Part 1: Install MLFlow MLflow is an &ldquo;open source platform for the machine learning lifecycle&rdquo;."/>
+
+  </head>
+
+  <body class="ma0 avenir bg-near-white">
+
+    
+   
+  
+
+  <header>
+    <div class="bg-dark-blue">
+      <nav class="pv3 ph3 ph4-ns" role="navigation">
+  <div class="flex-l justify-between items-center center">
+    <a href="https://j-buss.github.io/jb_blog/" class="f3 fw2 hover-white no-underline white-90 dib">
+      jrem.me
+    </a>
+    <div class="flex-l items-center">
+      
+
+      
+        <ul class="pl0 mr3">
+          
+          <li class="list f5 f4-ns fw4 dib pr3">
+            <a class="hover-white no-underline white-90" href="/jb_blog/posts/" title="Blog page">
+              Blog
+            </a>
+          </li>
+          
+          <li class="list f5 f4-ns fw4 dib pr3">
+            <a class="hover-white no-underline white-90" href="/jb_blog/about/" title="About page">
+              About
+            </a>
+          </li>
+          
+        </ul>
+      
+      
+
+
+
+
+
+
+
+
+
+
+
+
+    </div>
+  </div>
+</nav>
+
+    </div>
+  </header>
+
+
+
+    <main class="pb7" role="main">
+      
+  
+  <article class="flex-l flex-wrap justify-between mw8 center ph3">
+
+    <header class="mt4 w-100">
+      <p class="f6 b helvetica tracked">
+          
+        POSTS
+      </p>
+      <h1 class="f1 athelas mb1">MLflow on Google Cloud Platform</h1>
+      
+      
+      <time class="f6 mv4 dib tracked" datetime="2019-12-22T10:25:54-06:00">December 22, 2019</time>
+      
+      
+    </header>
+
+    <section class="nested-copy-line-height lh-copy serif f4 nested-links nested-img mid-gray pr4-l w-two-thirds-l"><style>
+table, th, td {
+      padding: 10px;
+      border: 1px solid black; 
+      border-collapse: collapse;
+}
+th{
+    background-color: grey;
+    color: white;
+}
+</style>
+<p>With this post we will setup MLflow and experiment with the machine learning workflow. Specifically we will install MLflow on a compute engine in GCP.</p>
+<h4 id="assumptions">Assumptions:</h4>
+<ul>
+<li>Familiarity with Python, and scikit-learn</li>
+<li>Access to a linux system
+<ul>
+<li>While the steps below don't necessarily require linux they were performed on linux so I can't speak to the ability to perform on Windows or Mac OS</li>
+</ul>
+</li>
+<li>Google Cloud Platform familiarity and access to a GCP project</li>
+</ul>
+<h2 id="part-1-install-mlflow">Part 1: Install MLFlow</h2>
+<p><a href="http://mlflow.org">MLflow</a> is an &ldquo;open source platform for the machine learning lifecycle&rdquo;. There is a great introduction post <a href="https://databricks.com/blog/2018/06/05/introducing-mlflow-an-open-source-machine-learning-platform.html">Introducing MLflow: an Open Source Machine Learning Platform</a> which highlights the 4 main challenges that the mlflow platform intends to solve for the machine learning lifecycle:</p>
+<ol>
+<li>There are a myriad of tools</li>
+<li>It's hard to track experiments</li>
+<li>It's hard to reproduce results</li>
+<li>It's hard to deploy ML</li>
+</ol>
+<p>In this post we won't specifically highlight the individual challenges, but simply get hands-on to install it and use for an example ml project.</p>
+<h3 id="1-install-mlflow-on-a-compute-engine">1. Install MLFlow on a Compute Engine</h3>
+<h4 id="create-compute-engine">Create Compute Engine</h4>
+<p>I am assuming you have some familiarity with setting up GCP components. The following are the notable selections I made in setting up the server in the cloud:</p>
+<table>
+<thead>
+<tr>
+<th align="center">Field</th>
+<th align="center">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">Name</td>
+<td align="center">mlflow-test-vm-01</td>
+</tr>
+<tr>
+<td align="center">Region</td>
+<td align="center">us-central1</td>
+</tr>
+<tr>
+<td align="center">Zone</td>
+<td align="center">us-central1-a</td>
+</tr>
+<tr>
+<td align="center">Machine Type</td>
+<td align="center">n1-standard-1</td>
+</tr>
+<tr>
+<td align="center">Network tags</td>
+<td align="center">mlflow-ui</td>
+</tr>
+</tbody>
+</table>
+<p>Once the server is up and running you can log onto it (via ssh) and start executing the following commands. We are using the steps outlined in <a href="https://www.mlflow.org/docs/latest/tutorials-and-examples/tutorial.html">MLFlow Tutorial</a> as the basis of our work, but with the specifics needed for a new cloud instance.</p>
+<h4 id="install-conda">Install Conda</h4>
+<p>I tend to prefer a minimal installation so I went for the <a href="https://docs.conda.io/en/latest/miniconda.html">miniconda</a>. In the following command I am using the 64 bit installer for Python 3.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="color:#75715e"># Download latest miniconda installer</span>
+curl -O -J https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+<span style="color:#75715e"># Verify Checksums | compare with the value on the</span> 
+sha256sum Miniconda*
+</code></pre></div><p>Here is the result of executing the commands in Dec. 2019. The results will likely be different if you run the command and a newer version has been released with a different checksum result.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<img
+  sizes="(min-width: 35em) 1200px, 100vw"
+  srcset='
+  
+    /jb_blog/posts/machine-learning/mlflow-introduction/miniconda-checksum-results_hu9415ad74e9a72a447e2f2dbeea3e2472_13695_500x0_resize_box_2.png 500w
+  
+  
+    , /jb_blog/posts/machine-learning/mlflow-introduction/miniconda-checksum-results_hu9415ad74e9a72a447e2f2dbeea3e2472_13695_800x0_resize_box_2.png 800w
+  
+  
+    , /jb_blog/posts/machine-learning/mlflow-introduction/miniconda-checksum-results_hu9415ad74e9a72a447e2f2dbeea3e2472_13695_1200x0_resize_box_2.png 1200w
+  
+  '
+  
+    src="/jb_blog/posts/machine-learning/mlflow-introduction/miniconda-checksum-results.png"
+  
+  alt="">
+<p>and here is the matching value from the website:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<img
+  sizes="(min-width: 35em) 1200px, 100vw"
+  srcset='
+  
+    /jb_blog/posts/machine-learning/mlflow-introduction/miniconda-website-checksum_hu4e016a0a7b48c5875084c5ea4d83e54f_57817_500x0_resize_box_2.png 500w
+  
+  
+    , /jb_blog/posts/machine-learning/mlflow-introduction/miniconda-website-checksum_hu4e016a0a7b48c5875084c5ea4d83e54f_57817_800x0_resize_box_2.png 800w
+  
+  
+    , /jb_blog/posts/machine-learning/mlflow-introduction/miniconda-website-checksum_hu4e016a0a7b48c5875084c5ea4d83e54f_57817_1200x0_resize_box_2.png 1200w
+  
+  '
+  
+    src="/jb_blog/posts/machine-learning/mlflow-introduction/miniconda-website-checksum.png"
+  
+  alt="">
+<p>When you are comfortable that the download is valid you can start the install of miniconda:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">bash Miniconda3-latest-Linux-x86_64.sh
+</code></pre></div><p>Along the way you can feel free to accept the default options.</p>
+<h5 id="optional-note-about-conda-init">(Optional) Note about conda init</h5>
+<p>The last option to initialize the system with <code>conda init</code> will modify your .bashrc scripts to include the miniconda directory in your path. Additionally it will have conda activated by default. I like this on a new server used only for this purpose. However, if performing these steps on my local/main workstation, I prefer to activate the conda shell manually with the command: <code>conda activate</code>. As such I would answer <em>no</em> to the previous <code>conda init</code> command. Additionally I would tell conda not to auto-activate with the following:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">conda config --set auto_activate_base false
+</code></pre></div><h4 id="activate-conda">Activate Conda</h4>
+<p>Assuming you had the installer execute the <code>conda init</code> command you can either open a new shell or just restart your shell:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">source .bashrc
+</code></pre></div><h4 id="install-git">Install git</h4>
+<p>If you don't already have git install you will need to perform the following:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">sudo apt-get update
+sudo apt-get install git
+</code></pre></div><h4 id="install-mlflow">Install mlflow</h4>
+<p>Ensure that you have your conda shell activated either by default or by manually typing <code>conda activate</code>. Your shell should generally have a &ldquo;(base)&rdquo; prefix like this:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<img
+  sizes="(min-width: 35em) 1200px, 100vw"
+  srcset='
+  
+    /jb_blog/posts/machine-learning/mlflow-introduction/shell_with_conda_activated_hue674692b7d19a2199ab658e65c6cea3d_9557_500x0_resize_box_2.png 500w
+  
+  
+    , /jb_blog/posts/machine-learning/mlflow-introduction/shell_with_conda_activated_hue674692b7d19a2199ab658e65c6cea3d_9557_800x0_resize_box_2.png 800w
+  
+  
+    , /jb_blog/posts/machine-learning/mlflow-introduction/shell_with_conda_activated_hue674692b7d19a2199ab658e65c6cea3d_9557_1200x0_resize_box_2.png 1200w
+  
+  '
+  
+    src="/jb_blog/posts/machine-learning/mlflow-introduction/shell_with_conda_activated.png"
+  
+  alt="">
+<p>Then you are ready to actually install the mlflow package with extras:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">pip install mlflow<span style="color:#f92672">[</span>extras<span style="color:#f92672">]</span>
+</code></pre></div><h4 id="add-the-code">Add the Code</h4>
+<p>The following steps can be done manually as the amount of information is very minimal. However you can also get the code from my github repository: <a href="https://github.com/j-buss/10-minute-tech-tutorials/tree/master/machine_learning"><a href="https://github.com/j-buss/10-minute-tech-tutorials/tree/master/machine_learning">https://github.com/j-buss/10-minute-tech-tutorials/tree/master/machine_learning</a></a></p>
+<p>Let's add two directories:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">mkdir mlflow-tutorial
+mkdir mlflow-tutorial/sklearn-iris-classification
+</code></pre></div><p>A brief explanation of each:</p>
+<ol>
+<li>mlflow-tutorial: The folder for all of our content. We will run our <code>mlflow</code> commands from this folder so in addition to the folder we will explicitly add in the next step, the mlflow framework will add some folders and files as well</li>
+<li>mlflow-tutorial/sklearn-iris-classification: A directory for the three code files: conda.yaml, MLproject and train.py</li>
+</ol>
+<h5 id="mlflowtutorialsklearnirisclassificationcondayaml">mlflow-tutorial/sklearn-iris-classification/conda.yaml</h5>
+<p>The conda.yaml file will ensure conda loads the appropriate libraries and dependencies for our mlflow execution.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">name: sklearn-example
+channels:
+  - defaults
+  - anaconda
+dependencies:
+  - python==<span style="color:#ae81ff">3.6</span>
+  - scikit-learn=<span style="color:#ae81ff">0.19</span><span style="color:#ae81ff">.1</span>
+  - pip=<span style="color:#ae81ff">19.3</span><span style="color:#ae81ff">.1</span>
+  - pip:
+    - mlflow&gt;=<span style="color:#ae81ff">1.0</span>
+</code></pre></div><h5 id="mlflowtutorialsklearnirisclassificationmlproject">mlflow-tutorial/sklearn-iris-classification/MLproject</h5>
+<p>The MLproject file is a mlflow configuration file that each project needs to identify the specific components of the model.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">name: sklearn_logistic_example
+
+conda_env: conda.yaml
+
+entry_points:
+  main:
+    command: <span style="color:#e6db74">&#34;python train.py&#34;</span>
+</code></pre></div><h5 id="mlflowtutorialsklearnirisclassificationtrainpy">mlflow-tutorial/sklearn-iris-classification/train.py</h5>
+<p>The train.py is the &ldquo;normal&rdquo; machine learning program file we would consider to be the basis of the ml model.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">from</span> sklearn <span style="color:#f92672">import</span> datasets
+<span style="color:#f92672">from</span> sklearn.linear_model <span style="color:#f92672">import</span> LogisticRegression
+<span style="color:#f92672">from</span> sklearn.model_selection <span style="color:#f92672">import</span> train_test_split
+<span style="color:#f92672">from</span> sklearn.metrics <span style="color:#f92672">import</span> accuracy_score
+<span style="color:#f92672">import</span> mlflow
+<span style="color:#f92672">import</span> mlflow.sklearn
+
+<span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">__main__</span><span style="color:#e6db74">&#34;</span>:
+    iris <span style="color:#f92672">=</span> datasets<span style="color:#f92672">.</span>load_iris()
+    X <span style="color:#f92672">=</span> iris<span style="color:#f92672">.</span>data
+    Y <span style="color:#f92672">=</span> iris<span style="color:#f92672">.</span>target
+    X_train, X_test, y_train, y_test <span style="color:#f92672">=</span> train_test_split(X, Y, test_size<span style="color:#f92672">=</span><span style="color:#ae81ff">0.33</span>, random_state<span style="color:#f92672">=</span><span style="color:#ae81ff">44</span>)
+    logreg <span style="color:#f92672">=</span> LogisticRegression()
+    logreg<span style="color:#f92672">.</span>fit(X_train, y_train)
+    y_pred <span style="color:#f92672">=</span> logreg<span style="color:#f92672">.</span>predict(X_test)
+    score <span style="color:#f92672">=</span> accuracy_score(y_test, y_pred)
+    <span style="color:#66d9ef">print</span>(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">Score: </span><span style="color:#e6db74">%s</span><span style="color:#e6db74">&#34;</span> <span style="color:#f92672">%</span> score)
+    mlflow<span style="color:#f92672">.</span>log_metric(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">score</span><span style="color:#e6db74">&#34;</span>, score)
+    mlflow<span style="color:#f92672">.</span>sklearn<span style="color:#f92672">.</span>log_model(logreg, <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">model</span><span style="color:#e6db74">&#34;</span>)
+    <span style="color:#66d9ef">print</span>(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">Model saved in run </span><span style="color:#e6db74">%s</span><span style="color:#e6db74">&#34;</span> <span style="color:#f92672">%</span> mlflow<span style="color:#f92672">.</span>active_run()<span style="color:#f92672">.</span>info<span style="color:#f92672">.</span>run_uuid)
+</code></pre></div><p>When you are done you should have a directory structure looking like the following:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<img
+  sizes="(min-width: 35em) 1200px, 100vw"
+  srcset='
+  
+    /jb_blog/posts/machine-learning/mlflow-introduction/mlflow_directory_structure_huc912b23d1709bdaee534553100e23f31_60510_500x0_resize_box_2.png 500w
+  
+  
+    , /jb_blog/posts/machine-learning/mlflow-introduction/mlflow_directory_structure_huc912b23d1709bdaee534553100e23f31_60510_800x0_resize_box_2.png 800w
+  
+  
+  '
+  
+    src="/jb_blog/posts/machine-learning/mlflow-introduction/mlflow_directory_structure.png"
+  
+  alt="">
+<hr>
+<h3 id="2-run-iris-classification">2. Run Iris Classification</h3>
+<p>With all of that prep work out of the we way we are now ready to run Iris Classification model through the mlflow framework.</p>
+<h4 id="train-the-ml-model">Train the ML Model</h4>
+<p>At the command line within the mlflow-tutorial directory run the following command:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">mlflow run sklearn_iris_classification
+</code></pre></div><p>This will ultimately train our logistic regression model. However, the first steps will build the conda environment by downloading the packages identified from within the conda.yaml file. This is the benefit of the conda framework as it creates an isolated environment for your code execution.</p>
+<p>The output of the model run will be stored in a new directory called &ldquo;mlruns&rdquo;.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<img
+  sizes="(min-width: 35em) 1200px, 100vw"
+  srcset='
+  
+    /jb_blog/posts/machine-learning/mlflow-introduction/directory_structure_mlruns_hu05fd6a5dd7843aa2fc29b4d71924181f_211051_500x0_resize_box_2.png 500w
+  
+  
+    , /jb_blog/posts/machine-learning/mlflow-introduction/directory_structure_mlruns_hu05fd6a5dd7843aa2fc29b4d71924181f_211051_800x0_resize_box_2.png 800w
+  
+  
+    , /jb_blog/posts/machine-learning/mlflow-introduction/directory_structure_mlruns_hu05fd6a5dd7843aa2fc29b4d71924181f_211051_1200x0_resize_box_2.png 1200w
+  
+  '
+  
+    src="/jb_blog/posts/machine-learning/mlflow-introduction/directory_structure_mlruns.png"
+  
+  alt="">
+<p>Feel free to look around, but in just a minute we will use the mlflow UI to view the results in a more consumable fashion.</p>
+<h4 id="open-a-firewall-port">Open a Firewall port</h4>
+<p>Before we can use the mlflow UI we need a firewall port open on GCP. Within GCP navigate to
+VPC Network-&gt;Firewall and create a firewall rule for our server.</p>
+<p>We will leverage the network tag &ldquo;mlflow-ui&rdquo; that we used when we created the server. Here are the selections for the firewall rule:</p>
+<table>
+<thead>
+<tr>
+<th align="center">Field</th>
+<th align="center">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">Name</td>
+<td align="center">mlflow-ui-allow</td>
+</tr>
+<tr>
+<td align="center">Network</td>
+<td align="center">default</td>
+</tr>
+<tr>
+<td align="center">Priority</td>
+<td align="center">1000</td>
+</tr>
+<tr>
+<td align="center">Direction of traffic</td>
+<td align="center">Ingress</td>
+</tr>
+<tr>
+<td align="center">Action on match</td>
+<td align="center">Allow</td>
+</tr>
+<tr>
+<td align="center">Targets</td>
+<td align="center">Specified target tags</td>
+</tr>
+<tr>
+<td align="center">Target tags</td>
+<td align="center">mlflow-ui</td>
+</tr>
+<tr>
+<td align="center">Source filter</td>
+<td align="center">IP ranges</td>
+</tr>
+<tr>
+<td align="center">Source IP ranges</td>
+<td align="center">0.0.0.0/0</td>
+</tr>
+<tr>
+<td align="center">Specified protocols and ports</td>
+<td align="center">tcp:8080,8081</td>
+</tr>
+</tbody>
+</table>
+<p>Click the &ldquo;Create&rdquo; button and we should be all set.</p>
+<p>Image of completed firewall rule &ldquo;mlflow-ui-allow&rdquo;:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<img
+  sizes="(min-width: 35em) 1200px, 100vw"
+  srcset='
+  
+    /jb_blog/posts/machine-learning/mlflow-introduction/firewall_rule_mlflow_ui_allow_huf9f3f205453de42c89890b7adbc5e06d_108650_500x0_resize_box_2.png 500w
+  
+  
+    , /jb_blog/posts/machine-learning/mlflow-introduction/firewall_rule_mlflow_ui_allow_huf9f3f205453de42c89890b7adbc5e06d_108650_800x0_resize_box_2.png 800w
+  
+  
+    , /jb_blog/posts/machine-learning/mlflow-introduction/firewall_rule_mlflow_ui_allow_huf9f3f205453de42c89890b7adbc5e06d_108650_1200x0_resize_box_2.png 1200w
+  
+  '
+  
+    src="/jb_blog/posts/machine-learning/mlflow-introduction/firewall_rule_mlflow_ui_allow.png"
+  
+  alt="">
+<h4 id="view-the-mlflow-ui-results">View the mlflow UI results</h4>
+<p>With the firewall rule in place we are set to start up the mlflow UI.</p>
+<p>Within our directory &ldquo;mlflow-tutorial&rdquo; start up the mlflow UI server by executing the following:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">mlflow ui -p <span style="color:#ae81ff">8080</span> -h 0.0.0.0
+</code></pre></div><p>You should receive some output like the following:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<img
+  sizes="(min-width: 35em) 1200px, 100vw"
+  srcset='
+  
+    /jb_blog/posts/machine-learning/mlflow-introduction/start-mlflow-ui_hu2626c30afdbb76457626cbde5b20ad30_80592_500x0_resize_box_2.png 500w
+  
+  
+    , /jb_blog/posts/machine-learning/mlflow-introduction/start-mlflow-ui_hu2626c30afdbb76457626cbde5b20ad30_80592_800x0_resize_box_2.png 800w
+  
+  
+    , /jb_blog/posts/machine-learning/mlflow-introduction/start-mlflow-ui_hu2626c30afdbb76457626cbde5b20ad30_80592_1200x0_resize_box_2.png 1200w
+  
+  '
+  
+    src="/jb_blog/posts/machine-learning/mlflow-introduction/start-mlflow-ui.png"
+  
+  alt="">
+<p>Open a browser and navigate to the external ip address of the server (with the port number &ldquo;:8080&rdquo; suffix).</p>
+<p>You will see one result for each of the training runs you have performed. In my case I ran trained the model two times.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<img
+  sizes="(min-width: 35em) 1200px, 100vw"
+  srcset='
+  
+    /jb_blog/posts/machine-learning/mlflow-introduction/mlflow-ui_hudf816ce6a0deaff1e93f7b1f981ef3e6_173780_500x0_resize_box_2.png 500w
+  
+  
+    , /jb_blog/posts/machine-learning/mlflow-introduction/mlflow-ui_hudf816ce6a0deaff1e93f7b1f981ef3e6_173780_800x0_resize_box_2.png 800w
+  
+  
+    , /jb_blog/posts/machine-learning/mlflow-introduction/mlflow-ui_hudf816ce6a0deaff1e93f7b1f981ef3e6_173780_1200x0_resize_box_2.png 1200w
+  
+  
+    , /jb_blog/posts/machine-learning/mlflow-introduction/mlflow-ui_hudf816ce6a0deaff1e93f7b1f981ef3e6_173780_1500x0_resize_box_2.png 1500w 
+  '
+  
+    src="/jb_blog/posts/machine-learning/mlflow-introduction/mlflow-ui.png"
+  
+  alt="">
+<p>There is much more you can explore in the UI by grouping experiments and comparing training results. However in the name of brevity I will skip it in this post and go to the model serving.</p>
+<h3 id="3-serve-the-model">3. Serve the Model</h3>
+<p>Now that we have a trained model we can serve it with the mlflow framework. This will create a flask app and allow us to send a new value to the model and predict the output. We simply need to know where the file is that contains the model.</p>
+<p>In our train.py code we had a line to save our model.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">mlflow<span style="color:#f92672">.</span>sklearn<span style="color:#f92672">.</span>log_model(logreg, <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">model</span><span style="color:#e6db74">&#34;</span>)
+</code></pre></div><p>Each time we train a model, or perform a &ldquo;run&rdquo;, mlflow keeps a set of information about that specific &ldquo;run&rdquo;, this includes the log files that we saw in the UI in addition to a trained model.</p>
+<p>Clicking on one of the runs from the UI experiments page we can see some information about the run:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<img
+  sizes="(min-width: 35em) 1200px, 100vw"
+  srcset='
+  
+    /jb_blog/posts/machine-learning/mlflow-introduction/mlflow_ui_run_details_hu2d0cf19cfd75107b3ac1e9f72cd86c67_69622_500x0_resize_box_2.png 500w
+  
+  
+    , /jb_blog/posts/machine-learning/mlflow-introduction/mlflow_ui_run_details_hu2d0cf19cfd75107b3ac1e9f72cd86c67_69622_800x0_resize_box_2.png 800w
+  
+  
+    , /jb_blog/posts/machine-learning/mlflow-introduction/mlflow_ui_run_details_hu2d0cf19cfd75107b3ac1e9f72cd86c67_69622_1200x0_resize_box_2.png 1200w
+  
+  
+    , /jb_blog/posts/machine-learning/mlflow-introduction/mlflow_ui_run_details_hu2d0cf19cfd75107b3ac1e9f72cd86c67_69622_1500x0_resize_box_2.png 1500w 
+  '
+  
+    src="/jb_blog/posts/machine-learning/mlflow-introduction/mlflow_ui_run_details.png"
+  
+  alt="">
+<p>Specifically towards the bottom of the page we can expand the Artifacts section and see that a model file was kept for the individual run:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<img
+  sizes="(min-width: 35em) 1200px, 100vw"
+  srcset='
+  
+    /jb_blog/posts/machine-learning/mlflow-introduction/mlflow_ui_artifacts_hu8f85ab3a9ac50ad96487224683fb054e_19330_500x0_resize_box_2.png 500w
+  
+  
+    , /jb_blog/posts/machine-learning/mlflow-introduction/mlflow_ui_artifacts_hu8f85ab3a9ac50ad96487224683fb054e_19330_800x0_resize_box_2.png 800w
+  
+  
+    , /jb_blog/posts/machine-learning/mlflow-introduction/mlflow_ui_artifacts_hu8f85ab3a9ac50ad96487224683fb054e_19330_1200x0_resize_box_2.png 1200w
+  
+  '
+  
+    src="/jb_blog/posts/machine-learning/mlflow-introduction/mlflow_ui_artifacts.png"
+  
+  alt="">
+<h4 id="serve">Serve</h4>
+<p>Now having confirmed that we have a model file we can serve it up with a different port number so we could still use the mlflow ui if needed:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="color:#75715e"># Replace &lt;run-id&gt; with specific run id</span>
+<span style="color:#75715e"># mlflow models serve -m runs:/&lt;run-id&gt;/model -p 8081 -h 0.0.0.0</span>
+mlflow models serve -m runs:/bbb6f1f04fd14aec8a39dea4b18759cb/model -p <span style="color:#ae81ff">8081</span> -h 0.0.0.0
+</code></pre></div><p>Now we need to get some data to test with from the scikit-learn iris dataset:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<img
+  sizes="(min-width: 35em) 1200px, 100vw"
+  srcset='
+  
+    /jb_blog/posts/machine-learning/mlflow-introduction/python_example_iris_values_hu700a79c50943d110d4784cf3e98269c5_50463_500x0_resize_box_2.png 500w
+  
+  
+    , /jb_blog/posts/machine-learning/mlflow-introduction/python_example_iris_values_hu700a79c50943d110d4784cf3e98269c5_50463_800x0_resize_box_2.png 800w
+  
+  
+  '
+  
+    src="/jb_blog/posts/machine-learning/mlflow-introduction/python_example_iris_values.png"
+  
+  alt="">
+<p>Then from another shell on your local workstation you can actually send a payload to the server to obtain a prediction from our trained model:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">curl http://34.70.102.58:8081/invocations -H <span style="color:#e6db74">&#39;Content-Type: application/json; format=pandas-records&#39;</span> -d <span style="color:#e6db74">&#39;[[5.1, 3.5, 1.4, 0.2]]&#39;</span>
+</code></pre></div><p>We should get the prediction of &ldquo;0&rdquo; back which tells us the iris in question is a &ldquo;setosa&rdquo;</p>
+<p>Let's try one more:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">curl http://34.70.102.58:8081/invocations -H <span style="color:#e6db74">&#39;Content-Type: application/json; format=pandas-records&#39;</span> -d <span style="color:#e6db74">&#39;[[5.9, 3.0, 5.1, 1.8]]&#39;</span>
+</code></pre></div><p>We should get the prediction of &ldquo;2&rdquo; which tells us the iris in question is a &ldquo;virginica&rdquo;</p>
+<h3 id="summary">Summary</h3>
+<p>So we have installed mlflow, trained a model and hosted it for making predictions. Make sure to turn off and/or delete any of the resources you are not going to keep using to ensure you are not hit with additional charges.</p>
+<hr>
+<h3 id="resources">Resources:</h3>
+<ul>
+<li>All the code can be found in my <a href="https://github.com/j-buss/10-minute-tech-tutorials">10-minute-tech-tutorials</a></li>
+<li><a href="https://www.mlflow.org/docs/latest/quickstart.html">mlflow Quickstart</a></li>
+<li><a href="https://www.mlflow.org/docs/latest/tutorials-and-examples/tutorial.html">mlflow Tutorial</a></li>
+</ul>
+<!DOCTYPE html>
+<html lang="en">
+<script src="/jb_blog/js/copy-code-button.js"></script>
+</html>
+<ul class="pa0">
+  
+</ul>
+<div class="mt6">
+      
+      
+      </div>
+    </section>
+
+    <aside class="w-30-l mt6-l">
+
+
+
+
+  <div class="bg-light-gray pa3 nested-list-reset nested-copy-line-height nested-links">
+    <p class="f5 b mb3">Related</p>
+    <ul class="pa0 list">
+	   
+	     <li  class="mb2">
+          <a href="/jb_blog/posts/hugo-website/copy-code-clipboard/">Copy Code to Clipboard</a>
+        </li>
+	    
+	     <li  class="mb2">
+          <a href="/jb_blog/posts/flask/part_01/">Flask Part 1 - Simple App</a>
+        </li>
+	    
+	     <li  class="mb2">
+          <a href="/jb_blog/about/">About</a>
+        </li>
+	    
+    </ul>
+</div>
+
+</aside>
+
+  </article>
+
+    </main>
+    <footer class="bg-dark-blue bottom-0 w-100 pa3" role="contentinfo">
+  <div class="flex justify-between">
+  <a class="f4 fw4 hover-white no-underline white-70 dn dib-ns pv2 ph3" href="https://j-buss.github.io/jb_blog/" >
+    &copy; 2019 jrem.me
+  </a>
+    <div>
+
+
+
+
+
+
+
+
+
+
+
+</div>
+  </div>
+</footer>
+
+    
+
+  <script src="/jb_blog/dist/js/app.3fc0f988d21662902933.js"></script>
+
+
+  </body>
+</html>

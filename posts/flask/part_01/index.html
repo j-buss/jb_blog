@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     
-    <title>jrem.me  | Simple Flask Example - Part 1</title>
+    <title>jrem.me  | Flask Part 1 - Simple App</title>
     <meta name="viewport" content="width=device-width,minimum-scale=1">
     <meta name="generator" content="Hugo 0.60.1" />
     
@@ -27,24 +27,24 @@
 
     
     
-    <meta property="og:title" content="Simple Flask Example - Part 1" />
+    <meta property="og:title" content="Flask Part 1 - Simple App" />
 <meta property="og:description" content="Deploying Flask Apps into Google Cloud Platform There are many Flask tutorials online that describe the details of using the lightweight Python framework. With this series I do not intend to recreate the exhaustive tutorials that have been done. I simply wanted a quick 3-post series to get up and running with deploying Flask to GCP App Engine and using data from Big Query.
 Within this post, Part 1, we will create a Flask app locally and then push it to GCP App Engine." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://j-buss.github.io/jb_blog/posts/flask/part_01/" />
 <meta property="article:published_time" content="2019-12-13T08:00:00+00:00" />
 <meta property="article:modified_time" content="2019-12-13T08:00:00+00:00" />
-<meta itemprop="name" content="Simple Flask Example - Part 1">
+<meta itemprop="name" content="Flask Part 1 - Simple App">
 <meta itemprop="description" content="Deploying Flask Apps into Google Cloud Platform There are many Flask tutorials online that describe the details of using the lightweight Python framework. With this series I do not intend to recreate the exhaustive tutorials that have been done. I simply wanted a quick 3-post series to get up and running with deploying Flask to GCP App Engine and using data from Big Query.
 Within this post, Part 1, we will create a Flask app locally and then push it to GCP App Engine.">
 <meta itemprop="datePublished" content="2019-12-13T08:00:00&#43;00:00" />
 <meta itemprop="dateModified" content="2019-12-13T08:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="671">
+<meta itemprop="wordCount" content="748">
 
 
 
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="Simple Flask Example - Part 1"/>
+<meta name="twitter:title" content="Flask Part 1 - Simple App"/>
 <meta name="twitter:description" content="Deploying Flask Apps into Google Cloud Platform There are many Flask tutorials online that describe the details of using the lightweight Python framework. With this series I do not intend to recreate the exhaustive tutorials that have been done. I simply wanted a quick 3-post series to get up and running with deploying Flask to GCP App Engine and using data from Big Query.
 Within this post, Part 1, we will create a Flask app locally and then push it to GCP App Engine."/>
 
@@ -115,7 +115,7 @@ Within this post, Part 1, we will create a Flask app locally and then push it to
           
         POSTS
       </p>
-      <h1 class="f1 athelas mb1">Simple Flask Example - Part 1</h1>
+      <h1 class="f1 athelas mb1">Flask Part 1 - Simple App</h1>
       
       
       <time class="f6 mv4 dib tracked" datetime="2019-12-13T08:00:00Z">December 13, 2019</time>
@@ -127,6 +127,7 @@ Within this post, Part 1, we will create a Flask app locally and then push it to
 <p>There are many Flask tutorials online that describe the details of using the lightweight Python framework. With this series I do not intend to recreate the exhaustive tutorials that have been done. I simply wanted a quick 3-post series to get up and running with deploying Flask to
 GCP App Engine and using data from Big Query.</p>
 <p>Within this post, Part 1, we will create a Flask app locally and then push it to GCP App Engine.</p>
+<p>Given that this post pertains to very simple code you can easily type it all. However, feel free to get the code from my github: <a href="https://github.com/j-buss/example_flask/tree/master/Part_01">example_flask - Part 1</a>.</p>
 <h4 id="assumptions">Assumptions:</h4>
 <ul>
 <li>Familiarity with Python</li>
@@ -139,12 +140,12 @@ GCP App Engine and using data from Big Query.</p>
 </ul>
 </li>
 </ul>
-<h2 id="part-1-creating-your-first-flask-app">Part 1: Creating Your First Flask App</h2>
+<h2 id="part-1-simple-app">Part 1: Simple App</h2>
 <p>Let's take a simple Flask app and deploy it to GCP. Essentially we will take the &ldquo;5-line minimum&rdquo; and add a few other items in order to deploy it to GCP App Engine.</p>
 <h3 id="1-minimum-app-tested-locally">1. Minimum app tested locally:</h3>
 <p>Install Flask:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">pip install flask
-</code></pre></div><p>Create the &ldquo;5-line minimum&rdquo; main.py file:</p>
+</code></pre></div><p>Create the &ldquo;5-line minimum&rdquo; main_local.py file:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">from</span> flask <span style="color:#f92672">import</span> Flask
 app <span style="color:#f92672">=</span> Flask(__name__)
 
@@ -154,7 +155,7 @@ app <span style="color:#f92672">=</span> Flask(__name__)
 </code></pre></div><p>This file is the only code needed.
 flask is a script&hellip;so we will execute it with a simple <code>flask run</code> command.
 However we need to set an environment variable first.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">export FLASK_APP<span style="color:#f92672">=</span>main.py
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">export FLASK_APP<span style="color:#f92672">=</span>main_local.py
 </code></pre></div><p>Now we are ready to run it:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">flask run
 </code></pre></div><p>If all went well we should get a output like the following:</p>
@@ -189,13 +190,13 @@ However we need to set an environment variable first.</p>
   sizes="(min-width: 35em) 1200px, 100vw"
   srcset='
   
-    /jb_blog/posts/flask/part_01/simple_flask_run_locally_hu8c283fce693395ad07cfb1372450abb2_90615_500x0_resize_box_2.png 500w
+    /jb_blog/posts/flask/part_01/simple_flask_run_locally_hu241b24f6c0b3353761a046a5e9c328a0_42539_500x0_resize_box_2.png 500w
   
   
-    , /jb_blog/posts/flask/part_01/simple_flask_run_locally_hu8c283fce693395ad07cfb1372450abb2_90615_800x0_resize_box_2.png 800w
+    , /jb_blog/posts/flask/part_01/simple_flask_run_locally_hu241b24f6c0b3353761a046a5e9c328a0_42539_800x0_resize_box_2.png 800w
   
   
-    , /jb_blog/posts/flask/part_01/simple_flask_run_locally_hu8c283fce693395ad07cfb1372450abb2_90615_1200x0_resize_box_2.png 1200w
+    , /jb_blog/posts/flask/part_01/simple_flask_run_locally_hu241b24f6c0b3353761a046a5e9c328a0_42539_1200x0_resize_box_2.png 1200w
   
   '
   
@@ -214,13 +215,23 @@ app <span style="color:#f92672">=</span> Flask(__name__)
     <span style="color:#66d9ef">return</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">Hello World!</span><span style="color:#e6db74">&#34;</span>
 <span style="display:block;width:100%;background-color:#3c3d38"><span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">__main__</span><span style="color:#e6db74">&#39;</span>:
 </span><span style="display:block;width:100%;background-color:#3c3d38">    app<span style="color:#f92672">.</span>run(port<span style="color:#f92672">=</span><span style="color:#ae81ff">8080</span>)
-</span></code></pre></div><h4 id="appyaml">app.yaml</h4>
-<p>We also need to make one more file for GCP App Engine to know how to load the application we just made. The following is our minmal version of the app.yaml file:</p>
+</span></code></pre></div><h4 id="add-two-more-files">Add Two More Files</h4>
+<p>We also need to make two more file for GCP App Engine to know how to load the application we just made:</p>
+<ol>
+<li>app.yaml</li>
+<li>requirements.txt</li>
+</ol>
+<h5 id="1-appyaml">1. app.yaml</h5>
+<p>There are many options you can add into the app.yaml file. We will simply be telling GCP what language we are using and the WSGI tool.
+We will be using the <a href="https://gunicorn.org/">gunicorn</a> tool as our WSGI. Additional information about the app.yaml can be found at the following:
+<a href="https://cloud.google.com/appengine/docs/standard/python3/config/appref">https://cloud.google.com/appengine/docs/standard/python3/config/appref</a></p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">runtime: python37
 entrypoint: gunicorn <span style="color:#f92672">-</span>b :<span style="color:#960050;background-color:#1e0010">$</span>PORT main:app
-</code></pre></div><p>We will be using the <a href="https://gunicorn.org/">gunicorn</a> tool as our WSGI. Additional information about the app.yaml can be found at the following:
-<a href="https://cloud.google.com/appengine/docs/standard/python3/config/appref">https://cloud.google.com/appengine/docs/standard/python3/config/appref</a></p>
-<h4 id="deploy">Deploy</h4>
+</code></pre></div><h5 id="2-requirementstxt">2. requirements.txt</h5>
+<p>The requirements file will contain the Python libraries that need to be loaded to be used in our application. We are using only two:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">Flask<span style="color:#f92672">==</span><span style="color:#ae81ff">1.1</span><span style="color:#f92672">.</span><span style="color:#ae81ff">1</span>
+gunicorn
+</code></pre></div><h4 id="deploy">Deploy</h4>
 <p>To deploy the App Engine application we will use the GCP SDK from the command line. As such we need to have an active project.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">gcloud config set project <span style="color:#f92672">[</span>PROJECT_NAME<span style="color:#f92672">]</span>
 </code></pre></div><p>Now it is time to perform the deployment:</p>

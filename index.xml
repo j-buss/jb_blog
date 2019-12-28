@@ -6,10 +6,20 @@
     <description>Recent content on jrem.me</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 17 Dec 2019 16:09:33 -0600</lastBuildDate>
+    <lastBuildDate>Sun, 22 Dec 2019 10:25:54 -0600</lastBuildDate>
     
 	<atom:link href="https://j-buss.github.io/jb_blog/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>MLflow on Google Cloud Platform</title>
+      <link>https://j-buss.github.io/jb_blog/posts/machine-learning/mlflow-introduction/</link>
+      <pubDate>Sun, 22 Dec 2019 10:25:54 -0600</pubDate>
+      
+      <guid>https://j-buss.github.io/jb_blog/posts/machine-learning/mlflow-introduction/</guid>
+      <description>table, th, td { padding: 10px; border: 1px solid black; border-collapse: collapse; } th{ background-color: grey; color: white; }  With this post we will setup MLflow and experiment with the machine learning workflow. Specifically we will install MLflow on a compute engine in GCP.
+Assumptions:  Familiarity with Python, and scikit-learn Access to a linux system  While the steps below don&#39;t necessarily require linux they were performed on linux so I can&#39;t speak to the ability to perform on Windows or Mac OS   Google Cloud Platform familiarity and access to a GCP project  Part 1: Install MLFlow MLflow is an &amp;ldquo;open source platform for the machine learning lifecycle&amp;rdquo;.</description>
+    </item>
     
     <item>
       <title>Copy Code to Clipboard</title>
@@ -49,7 +59,7 @@ blockquote p::after {
     </item>
     
     <item>
-      <title>Simple Flask Example - Part 1</title>
+      <title>Flask Part 1 - Simple App</title>
       <link>https://j-buss.github.io/jb_blog/posts/flask/part_01/</link>
       <pubDate>Fri, 13 Dec 2019 08:00:00 +0000</pubDate>
       
