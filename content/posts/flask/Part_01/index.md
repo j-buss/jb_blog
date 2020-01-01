@@ -4,8 +4,6 @@ date: 2019-12-13T08:00:00-00:00
 draft: false
 ---
 
-# Deploying Flask Apps into Google Cloud Platform
-
 There are many Flask tutorials online that describe the details of using the lightweight Python framework. With this series I do not intend to recreate the exhaustive tutorials that have been done. I simply wanted a quick 3-post series to get up and running with deploying Flask to
 GCP App Engine and using data from Big Query.
 
