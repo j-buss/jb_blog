@@ -1,7 +1,7 @@
 ---
 title: "Flask Part 2 - Reading BigQuery"
 date: 2019-12-29T05:54:03-06:00
-draft: true
+draft: false
 ---
 
 This is the next step in my Flask series. The previous post culminated into deploying an extremely simple application on GCP App Engine: [Flask Part 1 - Simple App]({{< ref "/posts/flask/Part_01/index.md" >}}). In this post we will extend the simple Flask App and read some data from a public dataset in BigQuery.
@@ -194,11 +194,7 @@ We have the template working, but we are going to add two features to make it mo
 
 #### Asynchronous Call
 
-We have glossed over some details of our call to `bigquery_client.query` 
-
-[bigquery_client.get_job](https://googleapis.dev/python/bigquery/latest/generated/google.cloud.bigquery.client.Client.html#google.cloud.bigquery.client.Client.get_job)
-
-As soon as we made the call to `bigquery_client.query` it submits a BigQuery job. We can see this in the shell if we execute the following:
+We have glossed over some details of our call to `bigquery_client.query`. As soon as the code is executed there is a BigQuery job submitted that we can see in the shell:
 
 ```shell script
 #List all BigQuery Jobs
@@ -206,27 +202,142 @@ As soon as we made the call to `bigquery_client.query` it submits a BigQuery job
 bq ls -j my-flask-tutorial-002
 ```
 
+Here is a picture of the output from my system:
 
+{{< img src="bq_job_list_image.png" >}}
+
+With this knowledge we can leverage another function: [bigquery_client.get_job](https://googleapis.dev/python/bigquery/latest/generated/google.cloud.bigquery.client.Client.html#google.cloud.bigquery.client.Client.get_job) to retrieve the output of the bigquery job. This will allow us to separate the steps of submitting the job from waiting for the results. This will add to the flexibility of our solution as we can set a timeout parameter to gracefully handle a timeout.
+
+1. Submit BigQuery Job - *saving (job_id, project_id, location)*
+2. Get BigQuery Job - *using (job_id, project_id, location)*
+    - Try to get results
+        - Show results
+    - Except Timeout
+        - Show Timeout Page
 
 #### Flask Redirect
 
-[flask.url_for](https://flask.palletsprojects.com/en/1.1.x/api/#flask.url_for)
+So using a Flask method [flask.url_for](https://flask.palletsprojects.com/en/1.1.x/api/#flask.url_for) , and passing along some arguments for the (job_id, project_id, and location) we will create a url and redirect with [flask.redirect](https://flask.palletsprojects.com/en/1.1.x/api/#flask.redirect), we will call another template page.
 
-[flask.redirect](https://flask.palletsprojects.com/en/1.1.x/api/#flask.redirect)
+```python {linenos=inline,linenostart=20}
+    # Redirect to the Results function below
+    return flask.redirect(
+        flask.url_for(
+            "results",
+            project_id=query_job.project,
+            job_id=query_job.job_id,
+            location=query_job.location,
+        )
+    )
+```
 
-[flask.request.args](https://flask.palletsprojects.com/en/1.1.x/api/#flask.Request.args)
+Now we will define a new function to display the results. One of the first things we must do is get the arguments from the url that we just in. Then we will call the BigQuery Job with the job_id, project_id and location obtained from the arguments.
 
-[flask.request.args.get](https://werkzeug.palletsprojects.com/en/0.16.x/datastructures/#werkzeug.datastructures.MultiDict.get)
+```python {linenos=inline,linenostart=30}
+@app.route("/results")
+def results():
 
+    # Get the Arguments that were passed into the url
+    project_id = flask.request.args.get("project_id")
+    job_id = flask.request.args.get("job_id")
+    location = flask.request.args.get("location")
 
+    # Get the BigQuery Job using the Arguments passed into the url
+    query_job = bigquery_client.get_job(
+        job_id,
+        project=project_id,
+        location=location,
+    )
 
+```
+Now in the new results function we will get the results from the query_job. If the results comeback before the timeout we will display them with the `render_template` as before. However if the timeout occurs we will display the timeout page.
 
-The output simply shows our makeshift html page with the BigQuery Job ID filled in:
+```python {linenos=inline,linenostart=45}
+    # Try to get the results from the query;
+    #   Display the results in the query result template
+    # Else if the exception TimeoutError then show the timeout page
+    try:
+        # Set a timeout because queries could take longer than one minute.
+        results = query_job.result(timeout=30)
+    except concurrent.futures.TimeoutError:
+        return flask.render_template("timeout.html", job_id=query_job.job_id)
 
-{{< img src="webpage_from_submit_query.png" >}}
+    return flask.render_template("query_result.html", results=results)
+```
+#### Putting it all Together
 
+Here is the full main.py file
 
+```python {linenos=inline}
+import flask
 
+from google.cloud import bigquery
+bigquery_client = bigquery.Client()
+
+app = flask.Flask(__name__)
+
+@app.route("/")
+def main():
+    # Define query_job and query object
+    query_job = bigquery_client.query(
+        """
+        SELECT 
+          COUNT(*) as Rec_Count 
+        FROM 
+          `bigquery-public-data.census_utility.fips_codes_all`
+        """
+    )
+ 
+    # Redirect to the Results function below
+    return flask.redirect(
+        flask.url_for(
+            "results",
+            project_id=query_job.project,
+            job_id=query_job.job_id,
+            location=query_job.location,
+        )
+    )
+
+@app.route("/results")
+def results():
+
+    # Get the Arguments that were passed into the url
+    project_id = flask.request.args.get("project_id")
+    job_id = flask.request.args.get("job_id")
+    location = flask.request.args.get("location")
+
+    # Get the BigQuery Job using the Arguments passed into the url
+    query_job = bigquery_client.get_job(
+        job_id,
+        project=project_id,
+        location=location,
+    )
+
+    # Try to get the results from the query;
+    #   Display the results in the query result template
+    # Else if the exception TimeoutError then show the timeout page
+    try:
+        # Set a timeout because queries could take longer than one minute.
+        results = query_job.result(timeout=30)
+    except concurrent.futures.TimeoutError:
+        return flask.render_template("timeout.html", job_id=query_job.job_id)
+
+    return flask.render_template("query_result.html", results=results)
+
+if __name__ == "__main__":
+    app.run(port=8080)
+```
+
+#### Summary 
+
+In this post we took three steps to ensure that we could load an app to GCP App Engine.
+
+We broke it up into 3 steps:
+1. Simple Query Job
+2. Display with Template
+3. Run Asynchronously
+
+Now our relatively simple application has some flexibility and we are ready for even more complex work!
 
 ---
 
