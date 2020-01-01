@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    
+    <title>jrem.me  | Flask Part 2 - Reading BigQuery</title>
+    <meta name="viewport" content="width=device-width,minimum-scale=1">
+    <meta name="generator" content="Hugo 0.60.1" />
+    
+    
+      <META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
+    
+
+    
+    
+      <link href="/jb_blog/dist/css/app.d98f2eb6bcd1eaedb7edf166bd16af26.css" rel="stylesheet">
+    
+
+    
+      <link rel="stylesheet" href="/jb_blog/css/post.css">
+    
+
+    
+      
+    
+
+    
+    
+    <meta property="og:title" content="Flask Part 2 - Reading BigQuery" />
+<meta property="og:description" content="This is the next step in my Flask series. The previous post culminated into deploying an extremely simple application on GCP App Engine: Flask Part 1 - Simple App. In this post we will extend the simple Flask App and read some data from a public dataset in BigQuery.
+We will break up the work into 3 steps:
+ Simple Query Job Display with Template Run Asynchronously  Assumptions:  Familiarity with Python Familiarity with Google Cloud Platform Access to a GCP Project with ability to deploy App Engine Linux working environment  This tutorial leverages GCP Cloud Shell Steps are not dependent on Linux, but haven&#39;t been tested in other environments   Also, I am assuming you have followed along with the previous post: Flask Part 1 - Simple App  1." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://j-buss.github.io/jb_blog/posts/flask/part_02/" />
+<meta property="article:published_time" content="2019-12-29T05:54:03-06:00" />
+<meta property="article:modified_time" content="2019-12-29T05:54:03-06:00" />
+<meta itemprop="name" content="Flask Part 2 - Reading BigQuery">
+<meta itemprop="description" content="This is the next step in my Flask series. The previous post culminated into deploying an extremely simple application on GCP App Engine: Flask Part 1 - Simple App. In this post we will extend the simple Flask App and read some data from a public dataset in BigQuery.
+We will break up the work into 3 steps:
+ Simple Query Job Display with Template Run Asynchronously  Assumptions:  Familiarity with Python Familiarity with Google Cloud Platform Access to a GCP Project with ability to deploy App Engine Linux working environment  This tutorial leverages GCP Cloud Shell Steps are not dependent on Linux, but haven&#39;t been tested in other environments   Also, I am assuming you have followed along with the previous post: Flask Part 1 - Simple App  1.">
+<meta itemprop="datePublished" content="2019-12-29T05:54:03-06:00" />
+<meta itemprop="dateModified" content="2019-12-29T05:54:03-06:00" />
+<meta itemprop="wordCount" content="1714">
+
+
+
+<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Flask Part 2 - Reading BigQuery"/>
+<meta name="twitter:description" content="This is the next step in my Flask series. The previous post culminated into deploying an extremely simple application on GCP App Engine: Flask Part 1 - Simple App. In this post we will extend the simple Flask App and read some data from a public dataset in BigQuery.
+We will break up the work into 3 steps:
+ Simple Query Job Display with Template Run Asynchronously  Assumptions:  Familiarity with Python Familiarity with Google Cloud Platform Access to a GCP Project with ability to deploy App Engine Linux working environment  This tutorial leverages GCP Cloud Shell Steps are not dependent on Linux, but haven&#39;t been tested in other environments   Also, I am assuming you have followed along with the previous post: Flask Part 1 - Simple App  1."/>
+
+  </head>
+
+  <body class="ma0 avenir bg-near-white">
+
+    
+   
+  
+
+  <header>
+    <div class="bg-dark-blue">
+      <nav class="pv3 ph3 ph4-ns" role="navigation">
+  <div class="flex-l justify-between items-center center">
+    <a href="https://j-buss.github.io/jb_blog/" class="f3 fw2 hover-white no-underline white-90 dib">
+      jrem.me
+    </a>
+    <div class="flex-l items-center">
+      
+
+      
+        <ul class="pl0 mr3">
+          
+          <li class="list f5 f4-ns fw4 dib pr3">
+            <a class="hover-white no-underline white-90" href="/jb_blog/posts/" title="Blog page">
+              Blog
+            </a>
+          </li>
+          
+          <li class="list f5 f4-ns fw4 dib pr3">
+            <a class="hover-white no-underline white-90" href="/jb_blog/about/" title="About page">
+              About
+            </a>
+          </li>
+          
+        </ul>
+      
+      
+
+
+
+
+
+
+
+
+
+
+
+
+    </div>
+  </div>
+</nav>
+
+    </div>
+  </header>
+
+
+
+    <main class="pb7" role="main">
+      
+  
+  <article class="flex-l flex-wrap justify-between mw8 center ph3">
+
+    <header class="mt4 w-100">
+      <p class="f6 b helvetica tracked">
+          
+        POSTS
+      </p>
+      <h1 class="f1 athelas mb1">Flask Part 2 - Reading BigQuery</h1>
+      
+      
+      <time class="f6 mv4 dib tracked" datetime="2019-12-29T05:54:03-06:00">December 29, 2019</time>
+      
+      
+    </header>
+
+    <section class="nested-copy-line-height lh-copy serif f4 nested-links nested-img mid-gray pr4-l w-two-thirds-l"><p>This is the next step in my Flask series. The previous post culminated into deploying an extremely simple application on GCP App Engine: <a href="https://j-buss.github.io/jb_blog/posts/flask/part_01/">Flask Part 1 - Simple App</a>. In this post we will extend the simple Flask App and read some data from a public dataset in BigQuery.</p>
+<p>We will break up the work into 3 steps:</p>
+<ol>
+<li>Simple Query Job</li>
+<li>Display with Template</li>
+<li>Run Asynchronously</li>
+</ol>
+<h4 id="assumptions">Assumptions:</h4>
+<ul>
+<li>Familiarity with Python</li>
+<li>Familiarity with Google Cloud Platform</li>
+<li>Access to a GCP Project with ability to deploy App Engine</li>
+<li>Linux working environment
+<ul>
+<li>This tutorial leverages GCP Cloud Shell</li>
+<li>Steps are not dependent on Linux, but haven't been tested in other environments</li>
+</ul>
+</li>
+<li>Also, I am assuming you have followed along with the previous post: <a href="https://j-buss.github.io/jb_blog/posts/flask/part_01/">Flask Part 1 - Simple App</a></li>
+</ul>
+<h2 id="1-simple-query-job">1. Simple Query Job</h2>
+<p>We will take our simple flask app from last time and add in the BigQuery components.</p>
+<h3 id="bigquery-library">BigQuery Library</h3>
+<p>In order to use BigQuery we will need to install the Python BigQuery library into our environment. We update the requirements.txt file with the following:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">Flask<span style="color:#f92672">==</span><span style="color:#ae81ff">1.1</span><span style="color:#f92672">.</span><span style="color:#ae81ff">1</span>
+gunicorn
+<span style="display:block;width:100%;background-color:#3c3d38">google<span style="color:#f92672">-</span>cloud<span style="color:#f92672">-</span>bigquery<span style="color:#f92672">==</span><span style="color:#ae81ff">1.22</span><span style="color:#f92672">.</span><span style="color:#ae81ff">0</span>
+</span></code></pre></div><p>Additionally, if you plan to test the code locally you should load the library in your shell:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">pip install google-cloud-bigquery
+</code></pre></div><h3 id="a-simple-query">A Simple Query</h3>
+<p>Now let's focus on a really simple query from a public BigQuery database. Let's use a public dataset from the Census Bureau's <a href="https://www.census.gov/programs-surveys/acs">American Community Survey (ACS)</a>. The ACS is a series of monthly samples that produces an annual estimate for the decennial census information.</p>
+<p>Feel free to use the BigQuery UI to explore the dataset some more, but for this post I will just use a count of records:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<img
+  sizes="(min-width: 35em) 1200px, 100vw"
+  srcset='
+  
+    /jb_blog/posts/flask/part_02/bigquery_ui_simple_query_results_hue4c2b70611a528fef9baab85bfc7d4ac_81046_500x0_resize_box_2.png 500w
+  
+  
+    , /jb_blog/posts/flask/part_02/bigquery_ui_simple_query_results_hue4c2b70611a528fef9baab85bfc7d4ac_81046_800x0_resize_box_2.png 800w
+  
+  
+  '
+  
+    src="/jb_blog/posts/flask/part_02/bigquery_ui_simple_query_results.png"
+  
+  alt="">
+<h3 id="modify-mainpy">Modify main.py</h3>
+<p>So with our simple query in hand we will need to make 3 additions to our code:</p>
+<ol>
+<li>BigQuery Library and client [Lines 3-4]
+<ul>
+<li>Add in the BigQuery Python Library and create a BigQuery client to connect to BigQuery</li>
+</ul>
+</li>
+<li><a href="https://googleapis.dev/python/bigquery/latest/generated/google.cloud.bigquery.job.QueryJob.html">query_job</a> [Lines 10-18]
+<ul>
+<li>The query_job is the BigQuery construct that will execute an asynchronous query to BigQuery</li>
+</ul>
+</li>
+<li>Handle results [Lines 20-24]
+<ul>
+<li>The query_job will return a <a href="https://googleapis.dev/python/bigquery/latest/generated/google.cloud.bigquery.table.RowIterator.html#google.cloud.bigquery.table.RowIterator">RowIterator</a></li>
+<li>Iterate through the return object to display results</li>
+</ul>
+</li>
+</ol>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span style="color:#f92672">import</span> flask
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>
+<span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span><span style="color:#f92672">from</span> google.cloud <span style="color:#f92672">import</span> bigquery
+</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>bigquery_client <span style="color:#f92672">=</span> bigquery<span style="color:#f92672">.</span>Client()
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>app <span style="color:#f92672">=</span> flask<span style="color:#f92672">.</span>Flask(__name__)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span><span style="color:#a6e22e">@app.route</span>(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">/</span><span style="color:#e6db74">&#34;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">main</span>():
+<span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>    <span style="color:#75715e"># Define query_job and query object</span>
+</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>    query_job <span style="color:#f92672">=</span> bigquery_client<span style="color:#f92672">.</span>query(
+</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>        <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;&#34;&#34;</span><span style="color:#e6db74">
+</span></span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span><span style="color:#e6db74"></span><span style="color:#e6db74">        SELECT </span><span style="color:#e6db74">
+</span></span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span><span style="color:#e6db74"></span><span style="color:#e6db74">          COUNT(*) as Rec_Count </span><span style="color:#e6db74">
+</span></span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span><span style="color:#e6db74"></span><span style="color:#e6db74">        FROM </span><span style="color:#e6db74">
+</span></span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span><span style="color:#e6db74"></span><span style="color:#e6db74">          `bigquery-public-data.census_utility.fips_codes_all`</span><span style="color:#e6db74">
+</span></span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span><span style="color:#e6db74"></span><span style="color:#e6db74">        </span><span style="color:#e6db74">&#34;&#34;&#34;</span>
+</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span>    )
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19</span>
+<span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20</span>    <span style="color:#75715e"># Handle query_job result and return to flask to display</span>
+</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21</span>    res <span style="color:#f92672">=</span> query_job<span style="color:#f92672">.</span>result()
+</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22</span>    <span style="color:#66d9ef">for</span> row <span style="color:#f92672">in</span> res:
+</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23</span>        output <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">Record Count: </span><span style="color:#e6db74">&#34;</span> <span style="color:#f92672">+</span> str(row[<span style="color:#ae81ff">0</span>])
+</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24</span>    <span style="color:#66d9ef">return</span> output
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26</span><span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">__main__</span><span style="color:#e6db74">&#34;</span>:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27</span>    app<span style="color:#f92672">.</span>run(port<span style="color:#f92672">=</span><span style="color:#ae81ff">8080</span>)
+</code></pre></div><p>So with the changes to our requirements.txt and main.py we are ready to test the app locally:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">export FLASK_APP<span style="color:#f92672">=</span>main.py
+flask run
+</code></pre></div><p>If the test is successful you can deploy to GCP App Engine:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="color:#75715e">#Substitute your PROJECT ID in the following</span>
+<span style="color:#75715e">#gcloud config set project &lt;PROJECT_ID&gt;</span>
+gcloud config set project my-flask-tutorial-002
+gcloud app deploy
+</code></pre></div><p>Once it is deployed give it a test and ensure that we get the results we expect:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<img
+  sizes="(min-width: 35em) 1200px, 100vw"
+  srcset='
+  
+    /jb_blog/posts/flask/part_02/simple_count_app_engine_results_hu5c95687d0ea9dcccaddbe378c7c6d51a_13585_500x0_resize_box_2.png 500w
+  
+  
+  
+  '
+  
+    src="/jb_blog/posts/flask/part_02/simple_count_app_engine_results.png"
+  
+  alt="">
+<h3 id="2-display-with-template">2. Display with Template</h3>
+<p>Let's make a minimal upgrade to our application. The only thing we are going to change is the usage of a <a href="https://jinja.palletsprojects.com/en/2.10.x/templates/">jinja template</a> to clean up the display of data from BigQuery. This will allow us 2 benefits:</p>
+<ul>
+<li>Cleaner Code</li>
+<li>Display Flexibility</li>
+</ul>
+<p>Let's handle the first item first.</p>
+<h4 id="cleaner-code">Cleaner Code</h4>
+<p>Here is an update to our main.py file with some changes on lines 20-21.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span style="color:#f92672">import</span> flask
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span><span style="color:#f92672">from</span> google.cloud <span style="color:#f92672">import</span> bigquery
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>bigquery_client <span style="color:#f92672">=</span> bigquery<span style="color:#f92672">.</span>Client()
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>app <span style="color:#f92672">=</span> flask<span style="color:#f92672">.</span>Flask(__name__)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span><span style="color:#a6e22e">@app.route</span>(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">/</span><span style="color:#e6db74">&#34;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">main</span>():
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>    <span style="color:#75715e"># Define query_job and query object</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>    query_job <span style="color:#f92672">=</span> bigquery_client<span style="color:#f92672">.</span>query(
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>        <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;&#34;&#34;</span><span style="color:#e6db74">
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span><span style="color:#e6db74"></span><span style="color:#e6db74">        SELECT </span><span style="color:#e6db74">
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span><span style="color:#e6db74"></span><span style="color:#e6db74">          COUNT(*) as Rec_Count </span><span style="color:#e6db74">
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span><span style="color:#e6db74"></span><span style="color:#e6db74">        FROM </span><span style="color:#e6db74">
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span><span style="color:#e6db74"></span><span style="color:#e6db74">          `bigquery-public-data.census_utility.fips_codes_all`</span><span style="color:#e6db74">
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span><span style="color:#e6db74"></span><span style="color:#e6db74">        </span><span style="color:#e6db74">&#34;&#34;&#34;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span>    )
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19</span>
+<span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20</span>    <span style="color:#75715e"># Handle query_job result by rendering with a template</span>
+</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21</span>    <span style="color:#66d9ef">return</span> flask<span style="color:#f92672">.</span>render_template(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">query_result.html</span><span style="color:#e6db74">&#34;</span>, results<span style="color:#f92672">=</span>query_job<span style="color:#f92672">.</span>result())
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23</span><span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">__main__</span><span style="color:#e6db74">&#34;</span>:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24</span>    app<span style="color:#f92672">.</span>run(port<span style="color:#f92672">=</span><span style="color:#ae81ff">8080</span>)
+</code></pre></div><p>We are simply using the <a href="https://flask.palletsprojects.com/en/1.1.x/api/#flask.render_template">flask.render_template</a> method to &ldquo;render a template from the template folder with the given context&rdquo;. We are telling it to use the file <code>templates/query_result.html</code> with the results <code>query_job.result()</code>.</p>
+<h4 id="display-flexibility">Display Flexibility</h4>
+<p>So what is this file <code>templates/query_result.html</code> that I just casually mentioned, but does not yet exist? We will get to that, but it is is very important to understand what we are accomplishing before we get to the code. With the flask templating we are able to create files that can handle code, but will render into static files, in this specific case they will become html.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span style="color:#75715e">&lt;!DOCTYPE html&gt;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>&lt;<span style="color:#f92672">table</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span>    &lt;<span style="color:#f92672">thead</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>        &lt;<span style="color:#f92672">tr</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>            &lt;<span style="color:#f92672">th</span>&gt;Record Count&lt;/<span style="color:#f92672">th</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>        &lt;/<span style="color:#f92672">tr</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>    &lt;/<span style="color:#f92672">thead</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>    &lt;<span style="color:#f92672">tbody</span>&gt;
+<span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>    {% for row in results %}
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>    &lt;<span style="color:#f92672">tr</span>&gt;
+<span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>        &lt;<span style="color:#f92672">td</span>&gt;{{ row[0] }}&lt;/<span style="color:#f92672">td</span>&gt;
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>    &lt;/<span style="color:#f92672">tr</span>&gt;
+<span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>    {% endfor %}
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span>    &lt;/<span style="color:#f92672">tbody</span>&gt;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span>&lt;/<span style="color:#f92672">table</span>&gt;
+</code></pre></div><p>With lines 9 and 13 we define the start and end of a for loop respectively. This means that the <code>results</code> coming into the template will be iterated in this loop.</p>
+<p>Then in line 11 we are taking the first element of the row and displaying it within the an html cell <code>&lt;td&gt;...&lt;/td&gt;</code> within a row <code>&lt;tr&gt;...&lt;/tr&gt;</code></p>
+<h4 id="test-it">Test It</h4>
+<p>OK. The changes to main.py and the new templates/query_result.html file are the only changes to make. Feel free to give it a test locally and then in GCP App Engine. Your output should look like the following:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<img
+  sizes="(min-width: 35em) 1200px, 100vw"
+  srcset='
+  
+    /jb_blog/posts/flask/part_02/flask_template_version_output_hu1166beacd09a05c104cc6e53fd540657_11836_500x0_resize_box_2.png 500w
+  
+  
+    , /jb_blog/posts/flask/part_02/flask_template_version_output_hu1166beacd09a05c104cc6e53fd540657_11836_800x0_resize_box_2.png 800w
+  
+  
+  '
+  
+    src="/jb_blog/posts/flask/part_02/flask_template_version_output.png"
+  
+  alt="">
+<p>Note the slight difference in the output as we placed the results into an html table in our template file.</p>
+<h3 id="3-run-asynchronously">3. Run Asynchronously</h3>
+<p>We have the template working, but we are going to add two features to make it more robust:</p>
+<ul>
+<li>Asynchronous Call</li>
+<li>Flask Redirect</li>
+</ul>
+<h4 id="asynchronous-call">Asynchronous Call</h4>
+<p>We have glossed over some details of our call to <code>bigquery_client.query</code>. As soon as the code is executed there is a BigQuery job submitted that we can see in the shell:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="color:#75715e">#List all BigQuery Jobs</span>
+<span style="color:#75715e">#bq ls -j &lt;PROJECT_ID&gt;</span>
+bq ls -j my-flask-tutorial-002
+</code></pre></div><p>Here is a picture of the output from my system:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<img
+  sizes="(min-width: 35em) 1200px, 100vw"
+  srcset='
+  
+    /jb_blog/posts/flask/part_02/bq_job_list_image_hud2123cf6cdad74369a5572f616db8670_112546_500x0_resize_box_2.png 500w
+  
+  
+    , /jb_blog/posts/flask/part_02/bq_job_list_image_hud2123cf6cdad74369a5572f616db8670_112546_800x0_resize_box_2.png 800w
+  
+  
+  '
+  
+    src="/jb_blog/posts/flask/part_02/bq_job_list_image.png"
+  
+  alt="">
+<p>With this knowledge we can leverage another function: <a href="https://googleapis.dev/python/bigquery/latest/generated/google.cloud.bigquery.client.Client.html#google.cloud.bigquery.client.Client.get_job">bigquery_client.get_job</a> to retrieve the output of the bigquery job. This will allow us to separate the steps of submitting the job from waiting for the results. This will add to the flexibility of our solution as we can set a timeout parameter to gracefully handle a timeout.</p>
+<ol>
+<li>Submit BigQuery Job - <em>saving (job_id, project_id, location)</em></li>
+<li>Get BigQuery Job - <em>using (job_id, project_id, location)</em>
+<ul>
+<li>Try to get results
+<ul>
+<li>Show results</li>
+</ul>
+</li>
+<li>Except Timeout
+<ul>
+<li>Show Timeout Page</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h4 id="flask-redirect">Flask Redirect</h4>
+<p>So using a Flask method <a href="https://flask.palletsprojects.com/en/1.1.x/api/#flask.url_for">flask.url_for</a> , and passing along some arguments for the (job_id, project_id, and location) we will create a url and redirect with <a href="https://flask.palletsprojects.com/en/1.1.x/api/#flask.redirect">flask.redirect</a>, we will call another template page.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20</span>    <span style="color:#75715e"># Redirect to the Results function below</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21</span>    <span style="color:#66d9ef">return</span> flask<span style="color:#f92672">.</span>redirect(
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22</span>        flask<span style="color:#f92672">.</span>url_for(
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23</span>            <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">results</span><span style="color:#e6db74">&#34;</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24</span>            project_id<span style="color:#f92672">=</span>query_job<span style="color:#f92672">.</span>project,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25</span>            job_id<span style="color:#f92672">=</span>query_job<span style="color:#f92672">.</span>job_id,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26</span>            location<span style="color:#f92672">=</span>query_job<span style="color:#f92672">.</span>location,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27</span>        )
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28</span>    )
+</code></pre></div><p>Now we will define a new function to display the results. One of the first things we must do is get the arguments from the url that we just in. Then we will call the BigQuery Job with the job_id, project_id and location obtained from the arguments.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30</span><span style="color:#a6e22e">@app.route</span>(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">/results</span><span style="color:#e6db74">&#34;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31</span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">results</span>():
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33</span>    <span style="color:#75715e"># Get the Arguments that were passed into the url</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34</span>    project_id <span style="color:#f92672">=</span> flask<span style="color:#f92672">.</span>request<span style="color:#f92672">.</span>args<span style="color:#f92672">.</span>get(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">project_id</span><span style="color:#e6db74">&#34;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">35</span>    job_id <span style="color:#f92672">=</span> flask<span style="color:#f92672">.</span>request<span style="color:#f92672">.</span>args<span style="color:#f92672">.</span>get(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">job_id</span><span style="color:#e6db74">&#34;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">36</span>    location <span style="color:#f92672">=</span> flask<span style="color:#f92672">.</span>request<span style="color:#f92672">.</span>args<span style="color:#f92672">.</span>get(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">location</span><span style="color:#e6db74">&#34;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">37</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">38</span>    <span style="color:#75715e"># Get the BigQuery Job using the Arguments passed into the url</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">39</span>    query_job <span style="color:#f92672">=</span> bigquery_client<span style="color:#f92672">.</span>get_job(
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">40</span>        job_id,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">41</span>        project<span style="color:#f92672">=</span>project_id,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">42</span>        location<span style="color:#f92672">=</span>location,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">43</span>    )
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">44</span>
+</code></pre></div><p>Now in the new results function we will get the results from the query_job. If the results comeback before the timeout we will display them with the <code>render_template</code> as before. However if the timeout occurs we will display the timeout page.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">45</span>    <span style="color:#75715e"># Try to get the results from the query;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">46</span>    <span style="color:#75715e">#   Display the results in the query result template</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">47</span>    <span style="color:#75715e"># Else if the exception TimeoutError then show the timeout page</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">48</span>    <span style="color:#66d9ef">try</span>:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">49</span>        <span style="color:#75715e"># Set a timeout because queries could take longer than one minute.</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">50</span>        results <span style="color:#f92672">=</span> query_job<span style="color:#f92672">.</span>result(timeout<span style="color:#f92672">=</span><span style="color:#ae81ff">30</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">51</span>    <span style="color:#66d9ef">except</span> concurrent<span style="color:#f92672">.</span>futures<span style="color:#f92672">.</span>TimeoutError:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">52</span>        <span style="color:#66d9ef">return</span> flask<span style="color:#f92672">.</span>render_template(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">timeout.html</span><span style="color:#e6db74">&#34;</span>, job_id<span style="color:#f92672">=</span>query_job<span style="color:#f92672">.</span>job_id)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">53</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">54</span>    <span style="color:#66d9ef">return</span> flask<span style="color:#f92672">.</span>render_template(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">query_result.html</span><span style="color:#e6db74">&#34;</span>, results<span style="color:#f92672">=</span>results)
+</code></pre></div><h4 id="putting-it-all-together">Putting it all Together</h4>
+<p>Here is the full main.py file</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span style="color:#f92672">import</span> flask
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span><span style="color:#f92672">from</span> google.cloud <span style="color:#f92672">import</span> bigquery
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>bigquery_client <span style="color:#f92672">=</span> bigquery<span style="color:#f92672">.</span>Client()
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>app <span style="color:#f92672">=</span> flask<span style="color:#f92672">.</span>Flask(__name__)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span><span style="color:#a6e22e">@app.route</span>(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">/</span><span style="color:#e6db74">&#34;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">main</span>():
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>    <span style="color:#75715e"># Define query_job and query object</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>    query_job <span style="color:#f92672">=</span> bigquery_client<span style="color:#f92672">.</span>query(
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>        <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;&#34;&#34;</span><span style="color:#e6db74">
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span><span style="color:#e6db74"></span><span style="color:#e6db74">        SELECT </span><span style="color:#e6db74">
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span><span style="color:#e6db74"></span><span style="color:#e6db74">          COUNT(*) as Rec_Count </span><span style="color:#e6db74">
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span><span style="color:#e6db74"></span><span style="color:#e6db74">        FROM </span><span style="color:#e6db74">
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span><span style="color:#e6db74"></span><span style="color:#e6db74">          `bigquery-public-data.census_utility.fips_codes_all`</span><span style="color:#e6db74">
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span><span style="color:#e6db74"></span><span style="color:#e6db74">        </span><span style="color:#e6db74">&#34;&#34;&#34;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span>    )
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19</span> 
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20</span>    <span style="color:#75715e"># Redirect to the Results function below</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21</span>    <span style="color:#66d9ef">return</span> flask<span style="color:#f92672">.</span>redirect(
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22</span>        flask<span style="color:#f92672">.</span>url_for(
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23</span>            <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">results</span><span style="color:#e6db74">&#34;</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24</span>            project_id<span style="color:#f92672">=</span>query_job<span style="color:#f92672">.</span>project,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25</span>            job_id<span style="color:#f92672">=</span>query_job<span style="color:#f92672">.</span>job_id,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26</span>            location<span style="color:#f92672">=</span>query_job<span style="color:#f92672">.</span>location,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27</span>        )
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28</span>    )
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30</span><span style="color:#a6e22e">@app.route</span>(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">/results</span><span style="color:#e6db74">&#34;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31</span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">results</span>():
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33</span>    <span style="color:#75715e"># Get the Arguments that were passed into the url</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34</span>    project_id <span style="color:#f92672">=</span> flask<span style="color:#f92672">.</span>request<span style="color:#f92672">.</span>args<span style="color:#f92672">.</span>get(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">project_id</span><span style="color:#e6db74">&#34;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">35</span>    job_id <span style="color:#f92672">=</span> flask<span style="color:#f92672">.</span>request<span style="color:#f92672">.</span>args<span style="color:#f92672">.</span>get(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">job_id</span><span style="color:#e6db74">&#34;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">36</span>    location <span style="color:#f92672">=</span> flask<span style="color:#f92672">.</span>request<span style="color:#f92672">.</span>args<span style="color:#f92672">.</span>get(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">location</span><span style="color:#e6db74">&#34;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">37</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">38</span>    <span style="color:#75715e"># Get the BigQuery Job using the Arguments passed into the url</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">39</span>    query_job <span style="color:#f92672">=</span> bigquery_client<span style="color:#f92672">.</span>get_job(
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">40</span>        job_id,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">41</span>        project<span style="color:#f92672">=</span>project_id,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">42</span>        location<span style="color:#f92672">=</span>location,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">43</span>    )
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">44</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">45</span>    <span style="color:#75715e"># Try to get the results from the query;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">46</span>    <span style="color:#75715e">#   Display the results in the query result template</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">47</span>    <span style="color:#75715e"># Else if the exception TimeoutError then show the timeout page</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">48</span>    <span style="color:#66d9ef">try</span>:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">49</span>        <span style="color:#75715e"># Set a timeout because queries could take longer than one minute.</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">50</span>        results <span style="color:#f92672">=</span> query_job<span style="color:#f92672">.</span>result(timeout<span style="color:#f92672">=</span><span style="color:#ae81ff">30</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">51</span>    <span style="color:#66d9ef">except</span> concurrent<span style="color:#f92672">.</span>futures<span style="color:#f92672">.</span>TimeoutError:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">52</span>        <span style="color:#66d9ef">return</span> flask<span style="color:#f92672">.</span>render_template(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">timeout.html</span><span style="color:#e6db74">&#34;</span>, job_id<span style="color:#f92672">=</span>query_job<span style="color:#f92672">.</span>job_id)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">53</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">54</span>    <span style="color:#66d9ef">return</span> flask<span style="color:#f92672">.</span>render_template(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">query_result.html</span><span style="color:#e6db74">&#34;</span>, results<span style="color:#f92672">=</span>results)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">55</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">56</span><span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">__main__</span><span style="color:#e6db74">&#34;</span>:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">57</span>    app<span style="color:#f92672">.</span>run(port<span style="color:#f92672">=</span><span style="color:#ae81ff">8080</span>)
+</code></pre></div><h4 id="summary">Summary</h4>
+<p>In this post we took three steps to ensure that we could load an app to GCP App Engine.</p>
+<p>We broke it up into 3 steps:</p>
+<ol>
+<li>Simple Query Job</li>
+<li>Display with Template</li>
+<li>Run Asynchronously</li>
+</ol>
+<p>Now our relatively simple application has some flexibility and we are ready for even more complex work!</p>
+<hr>
+<h3 id="resources">Resources:</h3>
+<h4 id="code">Code</h4>
+<ul>
+<li>All the code can be found in my github:
+<ul>
+<li><a href="https://github.com/j-buss/example_flask">https://github.com/j-buss/example_flask</a></li>
+</ul>
+</li>
+</ul>
+<h4 id="tutorials">Tutorials</h4>
+<ul>
+<li><a href="https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world">Flask Mega Tutorial</a>
+: The Flask Tutorial Gold Standard. In a clear and consistent format it walks you through all the basics and well into the intermediate range.
+Not only that, but the tutorial is a delight to work through.
+The author Miguel Grinberg writes in a way that it is a pleasure to follow along.
+His love of Flask and Python are evident.</li>
+<li><a href="https://hackersandslackers.com/your-first-flask-application/">Your First Flask App</a> is a series of posts which describe many facets of Flask.
+The series includes blueprints, Jinja and SQLAlchemy. It is not intended to be a step-by-step tutorial, but instead describes the concepts in a very
+conversational way.</li>
+<li><a href="https://codelabs.developers.google.com/codelabs/cloud-vision-app-engine/index.html?index=..%2F..index#0">Deploying a Python Flask Web Application to App Engine Flexible</a>
+is a Google Cloud Codelabs walk-through describing each of the steps to deploy a vision app from Google's Github repository:
+<a href="https://github.com/GoogleCloudPlatform/python-docs-samples">python-docs-sample</a></li>
+</ul>
+<h4 id="podcast">Podcast:</h4>
+<ul>
+<li><a href="https://talkpython.fm/episodes/show/48/building-flask-based-web-apps">Building Flask-based Web Apps</a> is a podcast interview on <a href="">Talk Python to Me</a></li>
+</ul>
+<!DOCTYPE html>
+<html lang="en">
+<script src="/jb_blog/js/copy-code-button.js"></script>
+</html>
+<ul class="pa0">
+  
+</ul>
+<div class="mt6">
+      
+      
+      </div>
+    </section>
+
+    <aside class="w-30-l mt6-l">
+
+
+
+
+  <div class="bg-light-gray pa3 nested-list-reset nested-copy-line-height nested-links">
+    <p class="f5 b mb3">Related</p>
+    <ul class="pa0 list">
+	   
+	     <li  class="mb2">
+          <a href="/jb_blog/posts/machine-learning/mlflow-introduction/">MLflow on Google Cloud Platform</a>
+        </li>
+	    
+	     <li  class="mb2">
+          <a href="/jb_blog/posts/hugo-website/copy-code-clipboard/">Copy Code to Clipboard</a>
+        </li>
+	    
+	     <li  class="mb2">
+          <a href="/jb_blog/posts/flask/part_01/">Flask Part 1 - Simple App</a>
+        </li>
+	    
+	     <li  class="mb2">
+          <a href="/jb_blog/about/">About</a>
+        </li>
+	    
+    </ul>
+</div>
+
+</aside>
+
+  </article>
+
+    </main>
+    <footer class="bg-dark-blue bottom-0 w-100 pa3" role="contentinfo">
+  <div class="flex justify-between">
+  <a class="f4 fw4 hover-white no-underline white-70 dn dib-ns pv2 ph3" href="https://j-buss.github.io/jb_blog/" >
+    &copy; 2020 jrem.me
+  </a>
+    <div>
+
+
+
+
+
+
+
+
+
+
+
+</div>
+  </div>
+</footer>
+
+    
+
+  <script src="/jb_blog/dist/js/app.3fc0f988d21662902933.js"></script>
+
+
+  </body>
+</html>

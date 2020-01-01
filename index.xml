@@ -6,10 +6,21 @@
     <description>Recent content on jrem.me</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 22 Dec 2019 10:25:54 -0600</lastBuildDate>
+    <lastBuildDate>Sun, 29 Dec 2019 05:54:03 -0600</lastBuildDate>
     
 	<atom:link href="https://j-buss.github.io/jb_blog/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Flask Part 2 - Reading BigQuery</title>
+      <link>https://j-buss.github.io/jb_blog/posts/flask/part_02/</link>
+      <pubDate>Sun, 29 Dec 2019 05:54:03 -0600</pubDate>
+      
+      <guid>https://j-buss.github.io/jb_blog/posts/flask/part_02/</guid>
+      <description>This is the next step in my Flask series. The previous post culminated into deploying an extremely simple application on GCP App Engine: Flask Part 1 - Simple App. In this post we will extend the simple Flask App and read some data from a public dataset in BigQuery.
+We will break up the work into 3 steps:
+ Simple Query Job Display with Template Run Asynchronously  Assumptions:  Familiarity with Python Familiarity with Google Cloud Platform Access to a GCP Project with ability to deploy App Engine Linux working environment  This tutorial leverages GCP Cloud Shell Steps are not dependent on Linux, but haven&#39;t been tested in other environments   Also, I am assuming you have followed along with the previous post: Flask Part 1 - Simple App  1.</description>
+    </item>
     
     <item>
       <title>MLflow on Google Cloud Platform</title>
@@ -64,7 +75,7 @@ blockquote p::after {
       <pubDate>Fri, 13 Dec 2019 08:00:00 +0000</pubDate>
       
       <guid>https://j-buss.github.io/jb_blog/posts/flask/part_01/</guid>
-      <description>Deploying Flask Apps into Google Cloud Platform There are many Flask tutorials online that describe the details of using the lightweight Python framework. With this series I do not intend to recreate the exhaustive tutorials that have been done. I simply wanted a quick 3-post series to get up and running with deploying Flask to GCP App Engine and using data from Big Query.
+      <description>There are many Flask tutorials online that describe the details of using the lightweight Python framework. With this series I do not intend to recreate the exhaustive tutorials that have been done. I simply wanted a quick 3-post series to get up and running with deploying Flask to GCP App Engine and using data from Big Query.
 Within this post, Part 1, we will create a Flask app locally and then push it to GCP App Engine.</description>
     </item>
     
