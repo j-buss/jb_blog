@@ -6,10 +6,20 @@
     <description>Recent content on jrem.me</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 29 Dec 2019 05:54:03 -0600</lastBuildDate>
+    <lastBuildDate>Thu, 02 Jan 2020 16:27:02 -0600</lastBuildDate>
     
 	<atom:link href="https://j-buss.github.io/jb_blog/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Plotly Introduction with Docker on GCP</title>
+      <link>https://j-buss.github.io/jb_blog/posts/plotly/plotly_intro_gcp_docker/</link>
+      <pubDate>Thu, 02 Jan 2020 16:27:02 -0600</pubDate>
+      
+      <guid>https://j-buss.github.io/jb_blog/posts/plotly/plotly_intro_gcp_docker/</guid>
+      <description>One of the keys to data analysis is a flexible tool to explore data and/or share those results with others. Within a corporate setting this usually translates to leveraging Microsoft&#39;s Power BI or Tableau. I have used both of these tools and enjoy them. However, for my independent analysis I was looking for a tool that was open source as well as fully programmable/integrated with python.
+I stumbled across Plotly Dash and it satisfied both of these requirements.</description>
+    </item>
     
     <item>
       <title>Flask Part 2 - Reading BigQuery</title>

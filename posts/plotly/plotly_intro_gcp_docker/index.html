@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    
+    <title>jrem.me  | Plotly Introduction with Docker on GCP</title>
+    <meta name="viewport" content="width=device-width,minimum-scale=1">
+    <meta name="generator" content="Hugo 0.60.1" />
+    
+    
+      <META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
+    
+
+    
+    
+      <link href="/jb_blog/dist/css/app.d98f2eb6bcd1eaedb7edf166bd16af26.css" rel="stylesheet">
+    
+
+    
+      <link rel="stylesheet" href="/jb_blog/css/post.css">
+    
+
+    
+      
+    
+
+    
+    
+    <meta property="og:title" content="Plotly Introduction with Docker on GCP" />
+<meta property="og:description" content="One of the keys to data analysis is a flexible tool to explore data and/or share those results with others. Within a corporate setting this usually translates to leveraging Microsoft&#39;s Power BI or Tableau. I have used both of these tools and enjoy them. However, for my independent analysis I was looking for a tool that was open source as well as fully programmable/integrated with python.
+I stumbled across Plotly Dash and it satisfied both of these requirements." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://j-buss.github.io/jb_blog/posts/plotly/plotly_intro_gcp_docker/" />
+<meta property="article:published_time" content="2020-01-02T16:27:02-06:00" />
+<meta property="article:modified_time" content="2020-01-02T16:27:02-06:00" />
+<meta itemprop="name" content="Plotly Introduction with Docker on GCP">
+<meta itemprop="description" content="One of the keys to data analysis is a flexible tool to explore data and/or share those results with others. Within a corporate setting this usually translates to leveraging Microsoft&#39;s Power BI or Tableau. I have used both of these tools and enjoy them. However, for my independent analysis I was looking for a tool that was open source as well as fully programmable/integrated with python.
+I stumbled across Plotly Dash and it satisfied both of these requirements.">
+<meta itemprop="datePublished" content="2020-01-02T16:27:02-06:00" />
+<meta itemprop="dateModified" content="2020-01-02T16:27:02-06:00" />
+<meta itemprop="wordCount" content="1290">
+
+
+
+<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Plotly Introduction with Docker on GCP"/>
+<meta name="twitter:description" content="One of the keys to data analysis is a flexible tool to explore data and/or share those results with others. Within a corporate setting this usually translates to leveraging Microsoft&#39;s Power BI or Tableau. I have used both of these tools and enjoy them. However, for my independent analysis I was looking for a tool that was open source as well as fully programmable/integrated with python.
+I stumbled across Plotly Dash and it satisfied both of these requirements."/>
+
+  </head>
+
+  <body class="ma0 avenir bg-near-white">
+
+    
+   
+  
+
+  <header>
+    <div class="bg-dark-blue">
+      <nav class="pv3 ph3 ph4-ns" role="navigation">
+  <div class="flex-l justify-between items-center center">
+    <a href="https://j-buss.github.io/jb_blog/" class="f3 fw2 hover-white no-underline white-90 dib">
+      jrem.me
+    </a>
+    <div class="flex-l items-center">
+      
+
+      
+        <ul class="pl0 mr3">
+          
+          <li class="list f5 f4-ns fw4 dib pr3">
+            <a class="hover-white no-underline white-90" href="/jb_blog/posts/" title="Blog page">
+              Blog
+            </a>
+          </li>
+          
+          <li class="list f5 f4-ns fw4 dib pr3">
+            <a class="hover-white no-underline white-90" href="/jb_blog/about/" title="About page">
+              About
+            </a>
+          </li>
+          
+        </ul>
+      
+      
+
+
+
+
+
+
+
+
+
+
+
+
+    </div>
+  </div>
+</nav>
+
+    </div>
+  </header>
+
+
+
+    <main class="pb7" role="main">
+      
+  
+  <article class="flex-l flex-wrap justify-between mw8 center ph3">
+
+    <header class="mt4 w-100">
+      <p class="f6 b helvetica tracked">
+          
+        POSTS
+      </p>
+      <h1 class="f1 athelas mb1">Plotly Introduction with Docker on GCP</h1>
+      
+      
+      <time class="f6 mv4 dib tracked" datetime="2020-01-02T16:27:02-06:00">January 2, 2020</time>
+      
+      
+    </header>
+
+    <section class="nested-copy-line-height lh-copy serif f4 nested-links nested-img mid-gray pr4-l w-two-thirds-l"><p>One of the keys to data analysis is a flexible tool to explore data and/or share those results with others. Within a corporate setting this usually translates to leveraging Microsoft's <a href="https://powerbi.microsoft.com/en-us/">Power BI</a> or <a href="https://www.tableau.com/">Tableau</a>. I have used both of these tools and enjoy them. However, for my independent analysis I was looking for a tool that was open source as well as fully programmable/integrated with python.</p>
+<p>I stumbled across <a href="https://plot.ly/dash/">Plotly Dash</a> and it satisfied both of these requirements. This post will be focused on some simple visualizations and specifically hosting them in Google Cloud Platform. While we could do this a few different ways I am choosing to create docker images and load in <a href="https://cloud.google.com/appengine/docs/flexible/">App Engine Flex</a>.</p>
+<p>We will build up with 3 steps:</p>
+<ol>
+<li>Simple Local</li>
+<li>Stand-up a Compute Engine to build Docker</li>
+<li>Build Docker Image and Deploy to GCP App Engine</li>
+</ol>
+<h4 id="assumptions">Assumptions:</h4>
+<ul>
+<li>Familiarity with Python</li>
+<li>Familiarity with Google Cloud Platform</li>
+<li>Access to a GCP Project with ability to deploy App Engine</li>
+<li>Linux working environment
+<ul>
+<li>This tutorial leverages GCP Cloud Shell</li>
+<li>Steps are not dependent on Linux, but haven't been tested in other environments</li>
+</ul>
+</li>
+</ul>
+<h4 id="disclaimer">Disclaimer:</h4>
+<ul>
+<li>The intent of this post is for learning to get the tool up and running and to share my experience.</li>
+<li>If you follow along there will be a cost for the cloud resources. However if you build it and then delete the project the cost will be minimal (&lt; $2 USD).</li>
+<li>In a future post we may examine how we could optimize the cost of the solution.</li>
+</ul>
+<h1 id="1-simple-local">1. Simple Local</h1>
+<p>This will be our first step and will serve as the basis for creating a plotly dash visualization. It is going to leverage the first app from Chapter 2 of the <a href="https://dash.plot.ly/getting-started">Dash Tutorial</a> and serve it up locally. We will just be adding a few lines of code to change the solution a bit and have it be part of a flask app.</p>
+<p>The solution consists of just two files:</p>
+<ul>
+<li>main.py</li>
+<li>requirements.txt</li>
+</ul>
+<h2 id="mainpy">main.py</h2>
+<p>The changes to main are focused on loading the flask app library, starting the flask server and changing the default port to serve the content.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span style="color:#f92672">import</span> flask
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span><span style="color:#f92672">import</span> dash
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span><span style="color:#f92672">import</span> dash_core_components <span style="color:#f92672">as</span> dcc
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span><span style="color:#f92672">import</span> dash_html_components <span style="color:#f92672">as</span> html
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>
+<span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>server <span style="color:#f92672">=</span> flask<span style="color:#f92672">.</span>Flask(__name__)
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>external_stylesheets <span style="color:#f92672">=</span> [<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">https://codepen.io/chriddyp/pen/bWLwgP.css</span><span style="color:#e6db74">&#39;</span>]
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>
+<span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>app <span style="color:#f92672">=</span> dash<span style="color:#f92672">.</span>Dash(
+</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>        __name__, 
+</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>        server<span style="color:#f92672">=</span>server,
+</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>        external_stylesheets<span style="color:#f92672">=</span>external_stylesheets
+</span><span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span>)
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span>app<span style="color:#f92672">.</span>layout <span style="color:#f92672">=</span> html<span style="color:#f92672">.</span>Div(children<span style="color:#f92672">=</span>[
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span>    html<span style="color:#f92672">.</span>H1(children<span style="color:#f92672">=</span><span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">Hello Dash</span><span style="color:#e6db74">&#39;</span>),
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19</span>    html<span style="color:#f92672">.</span>Div(children<span style="color:#f92672">=</span><span style="color:#e6db74"></span><span style="color:#e6db74">&#39;&#39;&#39;</span><span style="color:#e6db74">
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20</span><span style="color:#e6db74"></span><span style="color:#e6db74">        Dash: A web application framework for Python.</span><span style="color:#e6db74">
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21</span><span style="color:#e6db74"></span><span style="color:#e6db74">    </span><span style="color:#e6db74">&#39;&#39;&#39;</span>),
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23</span>    dcc<span style="color:#f92672">.</span>Graph(
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24</span>        id<span style="color:#f92672">=</span><span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">example-graph</span><span style="color:#e6db74">&#39;</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25</span>        figure<span style="color:#f92672">=</span>{
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26</span>            <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">data</span><span style="color:#e6db74">&#39;</span>: [
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27</span>                {<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">x</span><span style="color:#e6db74">&#39;</span>: [<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>], <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">y</span><span style="color:#e6db74">&#39;</span>: [<span style="color:#ae81ff">4</span>, <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>], <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">type</span><span style="color:#e6db74">&#39;</span>: <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">bar</span><span style="color:#e6db74">&#39;</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">name</span><span style="color:#e6db74">&#39;</span>: <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">SF</span><span style="color:#e6db74">&#39;</span>},
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28</span>                {<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">x</span><span style="color:#e6db74">&#39;</span>: [<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>], <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">y</span><span style="color:#e6db74">&#39;</span>: [<span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">4</span>, <span style="color:#ae81ff">5</span>], <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">type</span><span style="color:#e6db74">&#39;</span>: <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">bar</span><span style="color:#e6db74">&#39;</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">name</span><span style="color:#e6db74">&#39;</span>: <span style="color:#e6db74">u</span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">Montréal</span><span style="color:#e6db74">&#39;</span>},
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29</span>            ],
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30</span>            <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">layout</span><span style="color:#e6db74">&#39;</span>: {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31</span>                <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">title</span><span style="color:#e6db74">&#39;</span>: <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">Dash Data Visualization</span><span style="color:#e6db74">&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32</span>            }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33</span>        }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34</span>    )
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">35</span>])
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">36</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">37</span><span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">__main__</span><span style="color:#e6db74">&#39;</span>:
+<span style="display:block;width:100%;background-color:#3c3d38"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">38</span>    app<span style="color:#f92672">.</span>run_server(port<span style="color:#f92672">=</span><span style="color:#ae81ff">8080</span>, debug<span style="color:#f92672">=</span>True)
+</span></code></pre></div><h2 id="requirementstxt">requirements.txt</h2>
+<p>Our requirements.txt file is pretty straightforward as the Dash library tends to load all the associated libraries that are needed.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">dash==1.7.0
+</code></pre></div><h2 id="test-it">Test It</h2>
+<p>When we have those files in our environment we can test to ensure the solution works:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">pip3 install -r requirements.txt
+export FLASK_APP<span style="color:#f92672">=</span>main.y
+flask run
+</code></pre></div><p>With any luck we should see output with a URL:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<img
+  sizes="(min-width: 35em) 1200px, 100vw"
+  srcset='
+  
+    /jb_blog/posts/plotly/plotly_intro_gcp_docker/flask_run_output_hu457e59444825003b03a69d2b225a79b4_60801_500x0_resize_box_2.png 500w
+  
+  
+    , /jb_blog/posts/plotly/plotly_intro_gcp_docker/flask_run_output_hu457e59444825003b03a69d2b225a79b4_60801_800x0_resize_box_2.png 800w
+  
+  
+    , /jb_blog/posts/plotly/plotly_intro_gcp_docker/flask_run_output_hu457e59444825003b03a69d2b225a79b4_60801_1200x0_resize_box_2.png 1200w
+  
+  '
+  
+    src="/jb_blog/posts/plotly/plotly_intro_gcp_docker/flask_run_output.png"
+  
+  alt="">
+<p>Clicking on the url we should see the following:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<img
+  sizes="(min-width: 35em) 1200px, 100vw"
+  srcset='
+  
+    /jb_blog/posts/plotly/plotly_intro_gcp_docker/dash_simple_local_output_hu1441c22a943a9cf8be476af02ab7b8c7_78953_500x0_resize_box_2.png 500w
+  
+  
+    , /jb_blog/posts/plotly/plotly_intro_gcp_docker/dash_simple_local_output_hu1441c22a943a9cf8be476af02ab7b8c7_78953_800x0_resize_box_2.png 800w
+  
+  
+    , /jb_blog/posts/plotly/plotly_intro_gcp_docker/dash_simple_local_output_hu1441c22a943a9cf8be476af02ab7b8c7_78953_1200x0_resize_box_2.png 1200w
+  
+  
+    , /jb_blog/posts/plotly/plotly_intro_gcp_docker/dash_simple_local_output_hu1441c22a943a9cf8be476af02ab7b8c7_78953_1500x0_resize_box_2.png 1500w 
+  '
+  
+    src="/jb_blog/posts/plotly/plotly_intro_gcp_docker/dash_simple_local_output.png"
+  
+  alt="">
+<p>I know it's super simple, but always good to get the application to load properly. Now let's set our sights to moving our app to the cloud.</p>
+<h1 id="2-create-compute-engine">2. Create Compute Engine</h1>
+<p>Ok. There are many many ways that one could build our app. With this post we are going to create a docker image. This will give us extreme flexibility for hosting this app just about anywhere.</p>
+<p>You could build your docker image just about anywhere. However I will stand up a compute engine in the cloud in order to build the Docker image. I agree this is overkill; however I was doing this at a time that I was remote and needed a way to build and push the image to GCP without relying on my phone as a hotspot.</p>
+<h2 id="create-compute-engine">Create Compute Engine</h2>
+<p>I am assuming you have some familiarity with setting up GCP components. The following are the notable selections I made in setting up the server in the cloud:</p>
+<style>
+table, th, td {
+      padding: 10px;
+      border: 1px solid black; 
+      border-collapse: collapse;
+}
+th{
+    background-color: grey;
+    color: white;
+}
+</style>
+<table>
+<thead>
+<tr>
+<th align="center">Field</th>
+<th align="center">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">Name</td>
+<td align="center">docker-build-vm-001</td>
+</tr>
+<tr>
+<td align="center">Region</td>
+<td align="center">us-central1</td>
+</tr>
+<tr>
+<td align="center">Zone</td>
+<td align="center">us-central1-a</td>
+</tr>
+<tr>
+<td align="center">Machine Type</td>
+<td align="center">n1-standard-1</td>
+</tr>
+<tr>
+<td align="center">Access Scopes</td>
+<td align="center">Allow full access to all Cloud APIs</td>
+</tr>
+</tbody>
+</table>
+<p>Once the server is up and running you can log onto it (via ssh) and start executing the following commands to install Git and Docker.</p>
+<h3 id="install-git">Install Git</h3>
+<p>To install git is quite straightforward on the compute engine:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">sudo apt-get update
+sudo apt-get install git
+</code></pre></div><p>Answer &ldquo;Y&rdquo; to the prompts of requiring additional space for the install.</p>
+<h3 id="install-docker">Install Docker</h3>
+<p>We will use the following steps as the basis of our work: <a href="https://docs.docker.com/install/linux/docker-ce/debian/">Install Docker on Debian</a>.</p>
+<h4 id="install-packages-allowing-apt-over-https">Install packages allowing apt over HTTPS:</h4>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">sudo apt-get install <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>    apt-transport-https <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>    ca-certificates <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>    curl <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>    gnupg2 <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>    software-properties-common
+</code></pre></div><h4 id="add-dockers-official-gpg-key">Add Docker's official GPG Key:</h4>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
+</code></pre></div><h4 id="verify-the-key">Verify the key</h4>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">sudo apt-key fingerprint 0EBFCD88
+</code></pre></div><p>The output should resemble the following:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<img
+  sizes="(min-width: 35em) 1200px, 100vw"
+  srcset='
+  
+    /jb_blog/posts/plotly/plotly_intro_gcp_docker/verify_docker_key_output_hua77dbbe70052d768dbd9b2a1a85ade4d_66359_500x0_resize_box_2.png 500w
+  
+  
+    , /jb_blog/posts/plotly/plotly_intro_gcp_docker/verify_docker_key_output_hua77dbbe70052d768dbd9b2a1a85ade4d_66359_800x0_resize_box_2.png 800w
+  
+  
+    , /jb_blog/posts/plotly/plotly_intro_gcp_docker/verify_docker_key_output_hua77dbbe70052d768dbd9b2a1a85ade4d_66359_1200x0_resize_box_2.png 1200w
+  
+  '
+  
+    src="/jb_blog/posts/plotly/plotly_intro_gcp_docker/verify_docker_key_output.png"
+  
+  alt="">
+<h4 id="set-up-stable-repository">Set up Stable Repository</h4>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">sudo add-apt-repository <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>   <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">deb [arch=amd64] https://download.docker.com/linux/debian \
+</span><span style="color:#e6db74">   </span><span style="color:#66d9ef">$(</span>lsb_release -cs<span style="color:#66d9ef">)</span><span style="color:#e6db74"> \
+</span><span style="color:#e6db74">   stable</span><span style="color:#e6db74">&#34;</span>
+</code></pre></div><h4 id="update-the-apt-package-index">Update the apt package index</h4>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">sudo apt-get update
+</code></pre></div><h4 id="install-latest-version-of-docker-engine--community-and-containerd">Install latest version of Docker Engine - Community and containerd</h4>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">sudo apt-get install docker-ce docker-ce-cli containerd.io
+</code></pre></div><h4 id="run-helloworld-to-verify-install">Run Hello-World to verify Install</h4>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">sudo docker run hello-world
+</code></pre></div><p>If the install went successfully you will receive the following message:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<img
+  sizes="(min-width: 35em) 1200px, 100vw"
+  srcset='
+  
+    /jb_blog/posts/plotly/plotly_intro_gcp_docker/docker_hello_world_message_hub9869c4ea59f25ba760bb0e80994e937_104691_500x0_resize_box_2.png 500w
+  
+  
+    , /jb_blog/posts/plotly/plotly_intro_gcp_docker/docker_hello_world_message_hub9869c4ea59f25ba760bb0e80994e937_104691_800x0_resize_box_2.png 800w
+  
+  
+    , /jb_blog/posts/plotly/plotly_intro_gcp_docker/docker_hello_world_message_hub9869c4ea59f25ba760bb0e80994e937_104691_1200x0_resize_box_2.png 1200w
+  
+  '
+  
+    src="/jb_blog/posts/plotly/plotly_intro_gcp_docker/docker_hello_world_message.png"
+  
+  alt="">
+<h1 id="3-build-image-and-deploy-to-gcp-app-engine">3. Build Image and Deploy to GCP App Engine</h1>
+<p>Now that we have a compute engine we can log on and build out the Docker image. We will accomplish this in a few small steps.</p>
+<h2 id="1-download-the-github-repo">1. Download the Github Repo</h2>
+<p>Download the code needed to follow along and navigate to the directory in question.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">git clone http://github.com/j-buss/10-minute-tech-tutorial/
+cd 10-minute-tech-tutorial/python/plotly-intro-gcp-docker/02_Simple_Docker_Cloud
+</code></pre></div><h2 id="2-build-the-image">2. Build the image</h2>
+<p>The following commands will build a docker image. We will add a few environment variables to make typing of the commands a bit easier.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="color:#75715e"># Set some environment variables to facilitate ease of deploy</span>
+PROJECT_ID<span style="color:#f92672">=</span>my-plotly-tutorial-001
+APP_NAME<span style="color:#f92672">=</span>02-simple-docker-cloud
+<span style="color:#75715e"># Build the docker image</span>
+sudo docker build -t gcr.io/$PROJECT_ID/$APP_NAME:v1 .
+</code></pre></div><p>When the image is built you can view the image</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">sudo docker images
+</code></pre></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<img
+  sizes="(min-width: 35em) 1200px, 100vw"
+  srcset='
+  
+    /jb_blog/posts/plotly/plotly_intro_gcp_docker/list_docker_images_hubfc3a5e52462432569300e3e1e0b14ea_76631_500x0_resize_box_2.png 500w
+  
+  
+    , /jb_blog/posts/plotly/plotly_intro_gcp_docker/list_docker_images_hubfc3a5e52462432569300e3e1e0b14ea_76631_800x0_resize_box_2.png 800w
+  
+  
+    , /jb_blog/posts/plotly/plotly_intro_gcp_docker/list_docker_images_hubfc3a5e52462432569300e3e1e0b14ea_76631_1200x0_resize_box_2.png 1200w
+  
+  
+    , /jb_blog/posts/plotly/plotly_intro_gcp_docker/list_docker_images_hubfc3a5e52462432569300e3e1e0b14ea_76631_1500x0_resize_box_2.png 1500w 
+  '
+  
+    src="/jb_blog/posts/plotly/plotly_intro_gcp_docker/list_docker_images.png"
+  
+  alt="">
+<h3 id="push-image-to-container-registry">Push Image to Container Registry</h3>
+<p>Now that the image exists locally (relatively speaking since we are on a cloud compute engine) we can push it to a container registry. In this case we will use the GCP Container Registry.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="color:#75715e"># Authorize and push to GCP Container Registry</span>
+sudo gcloud auth configure-docker
+sudo docker push gcr.io/$PROJECT_ID/$APP_NAME:v1
+</code></pre></div><p>If this is successful we should be able to see the same image in the Container Registry:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<img
+  sizes="(min-width: 35em) 1200px, 100vw"
+  srcset='
+  
+    /jb_blog/posts/plotly/plotly_intro_gcp_docker/docker_image_in_container_registry_hu6b5ec98f89562af3d6a3ac5f24924f94_85240_500x0_resize_box_2.png 500w
+  
+  
+    , /jb_blog/posts/plotly/plotly_intro_gcp_docker/docker_image_in_container_registry_hu6b5ec98f89562af3d6a3ac5f24924f94_85240_800x0_resize_box_2.png 800w
+  
+  
+    , /jb_blog/posts/plotly/plotly_intro_gcp_docker/docker_image_in_container_registry_hu6b5ec98f89562af3d6a3ac5f24924f94_85240_1200x0_resize_box_2.png 1200w
+  
+  
+    , /jb_blog/posts/plotly/plotly_intro_gcp_docker/docker_image_in_container_registry_hu6b5ec98f89562af3d6a3ac5f24924f94_85240_1500x0_resize_box_2.png 1500w 
+  '
+  
+    src="/jb_blog/posts/plotly/plotly_intro_gcp_docker/docker_image_in_container_registry.png"
+  
+  alt="">
+<h3 id="deploy-application-in-gcp-app-engine">Deploy Application in GCP App Engine</h3>
+<p>Now we have all the pieces in place to actually deploy the application to the cloud.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="color:#75715e"># Deploy the application in GCP App Engine</span>
+sudo gcloud app deploy --image-url gcr.io/$PROJECT_ID/$APP_NAME:v1
+</code></pre></div><h3 id="test-it1">Test It</h3>
+<p>If the push to GCP App Engine is successful you can log on and test it. The link can be found on the GCP Console (#2 in the image). However make certain to change to the correct service (#1 in the image):</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<img
+  sizes="(min-width: 35em) 1200px, 100vw"
+  srcset='
+  
+    /jb_blog/posts/plotly/plotly_intro_gcp_docker/GCP_App_Engine_URL_hub3b0ecf2907e87cd6bc4196309b55d38_140483_500x0_resize_box_2.png 500w
+  
+  
+    , /jb_blog/posts/plotly/plotly_intro_gcp_docker/GCP_App_Engine_URL_hub3b0ecf2907e87cd6bc4196309b55d38_140483_800x0_resize_box_2.png 800w
+  
+  
+    , /jb_blog/posts/plotly/plotly_intro_gcp_docker/GCP_App_Engine_URL_hub3b0ecf2907e87cd6bc4196309b55d38_140483_1200x0_resize_box_2.png 1200w
+  
+  
+    , /jb_blog/posts/plotly/plotly_intro_gcp_docker/GCP_App_Engine_URL_hub3b0ecf2907e87cd6bc4196309b55d38_140483_1500x0_resize_box_2.png 1500w 
+  '
+  
+    src="/jb_blog/posts/plotly/plotly_intro_gcp_docker/GCP_App_Engine_URL.png"
+  
+  alt="">
+<p>The app should load the same as it did locally. With the exception being a different URL.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<img
+  sizes="(min-width: 35em) 1200px, 100vw"
+  srcset='
+  
+    /jb_blog/posts/plotly/plotly_intro_gcp_docker/GCP_App_Engine_test_dashboard_hua954f0573b5d6908fb95f6f4061afb08_96134_500x0_resize_box_2.png 500w
+  
+  
+    , /jb_blog/posts/plotly/plotly_intro_gcp_docker/GCP_App_Engine_test_dashboard_hua954f0573b5d6908fb95f6f4061afb08_96134_800x0_resize_box_2.png 800w
+  
+  
+    , /jb_blog/posts/plotly/plotly_intro_gcp_docker/GCP_App_Engine_test_dashboard_hua954f0573b5d6908fb95f6f4061afb08_96134_1200x0_resize_box_2.png 1200w
+  
+  
+    , /jb_blog/posts/plotly/plotly_intro_gcp_docker/GCP_App_Engine_test_dashboard_hua954f0573b5d6908fb95f6f4061afb08_96134_1500x0_resize_box_2.png 1500w 
+  '
+  
+    src="/jb_blog/posts/plotly/plotly_intro_gcp_docker/GCP_App_Engine_test_dashboard.png"
+  
+  alt="">
+<h2 id="delete-the-project">Delete the Project</h2>
+<p>After you have finished with following along make certain to delete your project so that you will not run up additional costs.</p>
+<hr>
+<h2 id="summary">Summary</h2>
+<p>We have built a simple Plotly Dash App, bundled it into a Docker Image and hosted it on GCP. We are poised to take on much more complex work!</p>
+<hr>
+<h3 id="resources">Resources:</h3>
+<h4 id="code">Code</h4>
+<h1 id="update-with-master-branch-link-after-final-commit">UPDATE WITH MASTER BRANCH LINK AFTER FINAL COMMIT</h1>
+<ul>
+<li>All the code can be found in my github: <a href="https://github.com/j-buss/10-minute-tech-tutorials/tree/dev-plotly-01/python/plotly-intro">10-minute-tech-tutorials/python/plotly-intro</a></li>
+</ul>
+<h4 id="tutorials">Tutorials</h4>
+<ul>
+<li><a href="https://dash.plot.ly/">Dash Tutorial</a> The official tutorial released by Plotly. It is a great introduction to the library.</li>
+</ul>
+<!DOCTYPE html>
+<html lang="en">
+<script src="/jb_blog/js/copy-code-button.js"></script>
+</html>
+<ul class="pa0">
+  
+</ul>
+<div class="mt6">
+      
+      
+      </div>
+    </section>
+
+    <aside class="w-30-l mt6-l">
+
+
+
+
+  <div class="bg-light-gray pa3 nested-list-reset nested-copy-line-height nested-links">
+    <p class="f5 b mb3">Related</p>
+    <ul class="pa0 list">
+	   
+	     <li  class="mb2">
+          <a href="/jb_blog/posts/flask/part_02/">Flask Part 2 - Reading BigQuery</a>
+        </li>
+	    
+	     <li  class="mb2">
+          <a href="/jb_blog/posts/machine-learning/mlflow-introduction/">MLflow on Google Cloud Platform</a>
+        </li>
+	    
+	     <li  class="mb2">
+          <a href="/jb_blog/posts/hugo-website/copy-code-clipboard/">Copy Code to Clipboard</a>
+        </li>
+	    
+	     <li  class="mb2">
+          <a href="/jb_blog/posts/flask/part_01/">Flask Part 1 - Simple App</a>
+        </li>
+	    
+	     <li  class="mb2">
+          <a href="/jb_blog/about/">About</a>
+        </li>
+	    
+    </ul>
+</div>
+
+</aside>
+
+  </article>
+
+    </main>
+    <footer class="bg-dark-blue bottom-0 w-100 pa3" role="contentinfo">
+  <div class="flex justify-between">
+  <a class="f4 fw4 hover-white no-underline white-70 dn dib-ns pv2 ph3" href="https://j-buss.github.io/jb_blog/" >
+    &copy; 2020 jrem.me
+  </a>
+    <div>
+
+
+
+
+
+
+
+
+
+
+
+</div>
+  </div>
+</footer>
+
+    
+
+  <script src="/jb_blog/dist/js/app.3fc0f988d21662902933.js"></script>
+
+
+  </body>
+</html>
